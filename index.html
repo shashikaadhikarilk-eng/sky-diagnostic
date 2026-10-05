@@ -63,7 +63,6 @@
           </div>
           <div class="order-1 sm:order-2 flex-shrink-0">
             <div class="w-24 h-24 rounded-full bg-black border-2 border-green-500 logo-glow-ring flex items-center justify-center overflow-hidden">
-              <!-- Your uploaded logo photo -->
               <img src="logo.png" alt="SKY TECHNOLOGIES Logo" class="w-full h-full object-cover rounded-full">
             </div>
           </div>
@@ -80,11 +79,11 @@
     <!-- Form -->
     <form id="skyForm" onsubmit="submitToGoogleSheet(event)" class="space-y-5">
       
-      <!-- Customer Name -->
+      <!-- Your Name / Customer Name -->
       <div class="sky-glass-card p-6">
         <label class="block mb-2 text-white font-bold text-base">
-          Customer Name *
-          <div class="text-xs text-gray-400 font-normal mt-0.5">පාරිභෝගිකයාගේ නම | வாடிக்கையாளர் பெயர்</div>
+          Your Name / Customer Name *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">ඔබගේ නම | ඔබේ නම | உங்கள் பெயர்</div>
         </label>
         <input type="text" name="customer_name" required placeholder="John Doe" class="w-full sky-input px-4 py-3 text-sm">
       </div>
@@ -154,7 +153,8 @@
   </div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx1FIfXSKcDa-T0MAQSP6vjt_2oQo6Ba8BUzWdeZ5_dVRr4qbx42gtrPFclmMe2Q9JsZg/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgfgWiJ61gaSetxiUF6dW15c3bqRDNd10ImvHrXZOiTMm7y5GVK-brqEkKmgNctxAAzA/exec";
+    const MY_WHATSAPP_NUMBER = "94764117935";
 
     function submitToGoogleSheet(e) {
       e.preventDefault();
@@ -163,10 +163,26 @@
       btn.disabled = true;
 
       const form = document.getElementById('skyForm');
+      const formData = new FormData(form);
 
-      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: new FormData(form) })
-        .then(response => {
-          alert('Success! Your details have been submitted to SKY TECHNOLOGIES.');
+      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
+        .then(response => response.json())
+        .then(data => {
+          const ticketNo = data.ticketNumber;
+          const name = formData.get('customer_name');
+          const device = formData.get('device_type');
+          const model = formData.get('device_model');
+
+          alert(`Success! Your Ticket Number is: ${ticketNo}`);
+
+          const msg = `*SKY TECHNOLOGIES - Diagnostic Request*%0A%0A` +
+                      `*Ticket No:* ${ticketNo}%0A` +
+                      `*Name:* ${name}%0A` +
+                      `*Device:* ${device} (${model})%0A%0A` +
+                      `Thank you!`;
+
+          window.location.href = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${msg}`;
+
           form.reset();
           btn.innerText = 'SUBMIT FORM';
           btn.disabled = false;
