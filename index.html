@@ -124,7 +124,6 @@
                 const ticketNum = data.ticketNumber;
                 alert("Success! Your Ticket Number is: " + ticketNum);
 
-                // WhatsApp redirection
                 const message = encodeURIComponent(`Hello Sky Technology, I have submitted a job form.\n\nTicket Number: ${ticketNum}\nName: ${formData.customerName}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nFault: ${formData.faultDescription}`);
                 window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
             } else {
