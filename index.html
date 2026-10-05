@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKY TECHNOLOGIES - Diagnostic Form</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+  
   <style>
     body {
       font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
@@ -63,7 +65,8 @@
           </div>
           <div class="order-1 sm:order-2 flex-shrink-0">
             <div class="w-24 h-24 rounded-full bg-black border-2 border-green-500 logo-glow-ring flex items-center justify-center overflow-hidden">
-              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='100%' height='100%' fill='%2322c55e'/><circle cx='100' cy='100' r='90' fill='%23000000'/><path d='M 30 110 A 70 45 0 1 1 125 150' fill='none' stroke='%2322c55e' stroke-width='7' stroke-linecap='round'/><text x='52' y='115' font-family='sans-serif' font-weight='900' font-size='40' fill='%23ffffff'>SKY</text><text x='98' y='130' font-family='sans-serif' font-weight='700' font-size='10' fill='%2322c55e'>TECHNOLOGIES</text></svg>" alt="SKY TECHNOLOGIES Logo" class="w-full h-full object-cover rounded-full">
+              <!-- Custom PNG Logo File -->
+              <img src="logo.png" alt="SKY TECHNOLOGIES Logo" class="w-full h-full object-cover rounded-full">
             </div>
           </div>
         </div>
@@ -146,6 +149,7 @@
         <textarea id="faultDescription" name="faultDescription" required rows="4" placeholder="Describe the issue in detail..." class="w-full sky-input px-4 py-3 text-sm"></textarea>
       </div>
 
+      <!-- Submit Button -->
       <button type="submit" id="submitBtn" class="w-full font-brand bg-gradient-to-r from-green-500 to-emerald-600 text-black font-bold py-4 rounded-xl shadow-lg hover:from-green-400 hover:to-emerald-500 transition cursor-pointer">
         SUBMIT FORM
       </button>
@@ -164,10 +168,14 @@
       submitBtn.innerText = 'SUBMITTING...';
 
       const selectedDeviceType = document.querySelector('input[name="deviceType"]:checked');
+      
+      // Clean non-numeric characters to prevent Google Sheets formula syntax errors
+      const rawPhone = document.getElementById('phoneNumber').value;
+      const cleanPhone = rawPhone.replace(/[^0-9]/g, '');
 
       const formData = {
         customerName: document.getElementById('customerName').value,
-        phoneNumber: document.getElementById('phoneNumber').value,
+        phoneNumber: cleanPhone,
         deviceType: selectedDeviceType ? selectedDeviceType.value : '',
         deviceModel: document.getElementById('deviceModel').value,
         serialNumber: document.getElementById('serialNumber').value,
@@ -182,11 +190,31 @@
       .then(data => {
         if (data.result === 'success') {
           const ticketNum = data.ticketNumber;
+          
           alert("Success! Your Ticket Number is: " + ticketNum);
 
-          const message = encodeURIComponent(`Hello SKY TECHNOLOGIES, I have submitted a diagnostic form.\n\nTicket Number: ${ticketNum}\nName: ${formData.customerName}\nPhone: ${formData.phoneNumber}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nS/N: ${formData.serialNumber}\nFault: ${formData.faultDescription}`);
+          const rawMessage = `🛠️ *SKY TECHNOLOGIES - DIAGNOSTIC REQUEST*
+
+🎫 *Ticket Number:* ${ticketNum}
+👤 *Name:* ${formData.customerName}
+📞 *Phone:* ${formData.phoneNumber}
+💻 *Device:* ${formData.deviceType} (${formData.deviceModel})
+🔢 *S/N:* ${formData.serialNumber}
+⚠️ *Fault:* ${formData.faultDescription}
+
+----------------------------------
+📌 *Note / සටහන / குறிப்பு:*
+
+🇬🇧 Hello SKY TECHNOLOGIES! My ticket number has been generated automatically above. As soon as you receive this message, please assist me.
+
+🇱🇰 හෙලෝ SKY TECHNOLOGIES! මගේ ටිකට් අංකය ඉහත ස්වයංක්‍රීයව ඇතුළත් වී ඇත. මෙම පණිවිඩය ඔබට ලැබුණු වහාම මට උදව් කරන්න.
+
+🇱🇰 ஹலோ SKY TECHNOLOGIES! எனது டிக்கெட் எண் மேலே தானாகவே சேர்க்கப்பட்டுள்ளது. இந்தச் செய்தி கிடைத்தவுடன் எனக்கு உதவுங்கள்.`;
+
+          const encodedMessage = encodeURIComponent(rawMessage);
           
-          window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
+          // Redirect to WhatsApp
+          window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${encodedMessage}`;
         } else {
           alert("Error submitting form: " + (data.error || "Unknown error"));
           submitBtn.disabled = false;
