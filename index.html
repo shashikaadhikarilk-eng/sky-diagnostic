@@ -1,145 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Technology - Job Ticket Form</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 500px;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin: auto;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKY TECHNOLOGIES - Diagnostic Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
+      background: radial-gradient(circle at top, #0b140d 0%, #05080a 50%, #020304 100%);
+      min-height: 100vh;
+      color: #e2e8f0;
+    }
+    .font-brand { font-family: 'Orbitron', sans-serif; }
+    .sky-glass-card {
+      background: rgba(10, 18, 14, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
+      border-radius: 16px;
+    }
+    .logo-glow-ring { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+    .neon-top-bar {
+      background: linear-gradient(90deg, #22c55e, #06b6d4, #10b981);
+      height: 4px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+    .sky-input {
+      background: rgba(5, 12, 8, 0.7);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #38bdf8;
+      border-radius: 8px;
+    }
+    .sky-input:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+      background: rgba(8, 20, 13, 0.9);
+      color: #ffffff;
+    }
+    input[type="radio"] { accent-color: #22c55e; }
+  </style>
 </head>
-<body>
+<body class="py-10 px-4 sm:px-6">
 
-<div class="container">
-    <h2>Sky Technology - Diagnostic Job Form</h2>
-    <form id="jobForm">
-        <div class="form-group">
-            <label for="customerName">Customer Name</label>
-            <input type="text" id="customerName" name="customerName" required>
+  <div class="max-w-2xl mx-auto space-y-6 relative z-10">
+    <!-- Header Card -->
+    <div class="sky-glass-card overflow-hidden">
+      <div class="neon-top-bar"></div>
+      <div class="p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b border-green-900/40">
+          <div class="text-center sm:text-left order-2 sm:order-1">
+            <h1 class="font-brand text-2xl sm:text-3xl font-extrabold text-white tracking-wider">
+              SKY <span class="text-green-500">TECHNOLOGIES</span>
+            </h1>
+            <p class="text-xs sm:text-sm font-semibold tracking-widest text-cyan-400 uppercase mt-1">
+              Repair & Diagnostic Request Form
+            </p>
+          </div>
+          <div class="order-1 sm:order-2 flex-shrink-0">
+            <div class="w-24 h-24 rounded-full bg-black border-2 border-green-500 logo-glow-ring flex items-center justify-center overflow-hidden">
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='100%' height='100%' fill='%2322c55e'/><circle cx='100' cy='100' r='90' fill='%23000000'/><path d='M 30 110 A 70 45 0 1 1 125 150' fill='none' stroke='%2322c55e' stroke-width='7' stroke-linecap='round'/><text x='52' y='115' font-family='sans-serif' font-weight='900' font-size='40' fill='%23ffffff'>SKY</text><text x='98' y='130' font-family='sans-serif' font-weight='700' font-size='10' fill='%2322c55e'>TECHNOLOGIES</text></svg>" alt="SKY TECHNOLOGIES Logo" class="w-full h-full object-cover rounded-full">
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-            <label for="phoneNumber">Phone Number</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" required>
+        <!-- Trilingual Description -->
+        <div class="mt-4 space-y-1.5 text-xs sm:text-sm text-gray-300">
+          <p><span class="text-green-400">❖</span> Submit your device diagnostic details below.</p>
+          <p><span class="text-cyan-400">❖</span> ඔබගේ උපකරණයේ පරික්ෂාව සඳහා විස්තර ඇතුළත් කරන්න.</p>
+          <p><span class="text-emerald-400">❖</span> சாதனப் பரிசோதனைக்கு கீழே உள்ள விவரங்களை நிரப்பவும்.</p>
         </div>
-        <div class="form-group">
-            <label for="deviceType">Device Type</label>
-            <select id="deviceType" name="deviceType" required>
-                <option value="">Select Device Type</option>
-                <option value="Laptop">Laptop</option>
-                <option value="Desktop PC">Desktop PC</option>
-                <option value="Motherboard">Motherboard</option>
-                <option value="VGA / Graphics Card">VGA / Graphics Card</option>
-                <option value="Monitor">Monitor</option>
-                <option value="Other">Other</option>
-            </select>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form id="skyForm" class="space-y-5">
+      
+      <!-- Customer Name -->
+      <div class="sky-glass-card p-6">
+        <label class="block mb-2 text-white font-bold text-base">
+          Customer Name *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">පාරිභෝගිකයාගේ නම | வாடிக்கையாளர் பெயர்</div>
+        </label>
+        <input type="text" id="customerName" name="customerName" required placeholder="John Doe" class="w-full sky-input px-4 py-3 text-sm">
+      </div>
+
+      <!-- Phone Number -->
+      <div class="sky-glass-card p-6">
+        <label class="block mb-2 text-white font-bold text-base">
+          Phone Number *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">දුරකථන අංකය | தொலைபேசி எண்</div>
+        </label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="07X XXXXXXX" class="w-full sky-input px-4 py-3 text-sm">
+      </div>
+
+      <!-- Device Type -->
+      <div class="sky-glass-card p-6">
+        <label class="block mb-3 text-white font-bold text-base">
+          Device Type *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">උපකරණ වර්ගය | சாதன வகை</div>
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-200">
+          <label class="flex items-center space-x-3 p-3 bg-black/40 border border-green-900/40 rounded-lg cursor-pointer hover:border-green-500/60 transition">
+            <input type="radio" name="deviceType" value="Laptop" required> <span>Laptop / ලැප්ටොප් / மடிக்கணினி</span>
+          </label>
+          <label class="flex items-center space-x-3 p-3 bg-black/40 border border-green-900/40 rounded-lg cursor-pointer hover:border-green-500/60 transition">
+            <input type="radio" name="deviceType" value="Motherboard"> <span>Motherboard / මවුපුවරුව / மதர்போர்டு</span>
+          </label>
+          <label class="flex items-center space-x-3 p-3 bg-black/40 border border-green-900/40 rounded-lg cursor-pointer hover:border-green-500/60 transition">
+            <input type="radio" name="deviceType" value="Graphic Card"> <span>Graphic Card (GPU) / ග්‍රැෆික් කාඩ්</span>
+          </label>
+          <label class="flex items-center space-x-3 p-3 bg-black/40 border border-green-900/40 rounded-lg cursor-pointer hover:border-green-500/60 transition">
+            <input type="radio" name="deviceType" value="Desktop PC"> <span>Desktop PC / ඩෙස්ක්ටොප් පරිගණකය</span>
+          </label>
         </div>
-        <div class="form-group">
-            <label for="deviceModel">Device Model</label>
-            <input type="text" id="deviceModel" name="deviceModel" required>
-        </div>
-        <div class="form-group">
-            <label for="serialNumber">Serial Number</label>
-            <input type="text" id="serialNumber" name="serialNumber" required>
-        </div>
-        <div class="form-group">
-            <label for="faultDescription">Fault Description</label>
-            <textarea id="faultDescription" name="faultDescription" rows="4" required></textarea>
-        </div>
-        <button type="submit" id="submitBtn">SUBMIT FORM</button>
+      </div>
+
+      <!-- Device Model -->
+      <div class="sky-glass-card p-6">
+        <label class="block mb-2 text-white font-bold text-base">
+          Device Model *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">උපකරණයේ මොඩලය | சாதன மாதிரி (e.g., ASUS ROG / RTX 3060)</div>
+        </label>
+        <input type="text" id="deviceModel" name="deviceModel" required placeholder="ASUS ROG / RTX 3060" class="w-full sky-input px-4 py-3 text-sm">
+      </div>
+
+      <!-- Serial Number -->
+      <div class="sky-glass-card p-6">
+        <label class="block mb-2 text-white font-bold text-base">
+          Serial Number (S/N) *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">අනුක්‍රමික අංකය | வரிசை எண்</div>
+        </label>
+        <input type="text" id="serialNumber" name="serialNumber" required placeholder="S/N Number" class="w-full sky-input px-4 py-3 text-sm">
+      </div>
+
+      <!-- Fault Description -->
+      <div class="sky-glass-card p-6">
+        <label class="block mb-2 text-white font-bold text-base">
+          Fault Description *
+          <div class="text-xs text-gray-400 font-normal mt-0.5">දෝෂය පිළිබඳ විස්තරය | கோளாறு விளக்கம்</div>
+        </label>
+        <textarea id="faultDescription" name="faultDescription" required rows="4" placeholder="Describe the issue in detail..." class="w-full sky-input px-4 py-3 text-sm"></textarea>
+      </div>
+
+      <button type="submit" id="submitBtn" class="w-full font-brand bg-gradient-to-r from-green-500 to-emerald-600 text-black font-bold py-4 rounded-xl shadow-lg hover:from-green-400 hover:to-emerald-500 transition cursor-pointer">
+        SUBMIT FORM
+      </button>
     </form>
-</div>
+  </div>
 
-<script>
+  <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyO8FFhBbu2z2qIwBvkNtF1miW0E5L41Yw5cq_V5e9QqNCxQ-OkQKm6D6zHK9UMP6jirQ/exec';
     const myWhatsAppNumber = '94764117935';
 
-    document.getElementById('jobForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Submitting...';
+    document.getElementById('skyForm').addEventListener('submit', function(e) {
+      e.preventDefault();
 
-        const formData = {
-            customerName: document.getElementById('customerName').value,
-            phoneNumber: document.getElementById('phoneNumber').value,
-            deviceType: document.getElementById('deviceType').value,
-            deviceModel: document.getElementById('deviceModel').value,
-            serialNumber: document.getElementById('serialNumber').value,
-            faultDescription: document.getElementById('faultDescription').value
-        };
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'SUBMITTING...';
 
-        fetch(scriptURL, {
-            method: 'POST',
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result === 'success') {
-                const ticketNum = data.ticketNumber;
-                alert("Success! Your Ticket Number is: " + ticketNum);
+      const selectedDeviceType = document.querySelector('input[name="deviceType"]:checked');
 
-                const message = encodeURIComponent(`Hello Sky Technology, I have submitted a job form.\n\nTicket Number: ${ticketNum}\nName: ${formData.customerName}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nFault: ${formData.faultDescription}`);
-                window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
-            } else {
-                alert("Error submitting form: " + (data.error || "Unknown error"));
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'SUBMIT FORM';
-            }
-        })
-        .catch(error => {
-            console.error('Error!', error.message);
-            alert("Something went wrong. Please try again.");
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'SUBMIT FORM';
-        });
+      const formData = {
+        customerName: document.getElementById('customerName').value,
+        phoneNumber: document.getElementById('phoneNumber').value,
+        deviceType: selectedDeviceType ? selectedDeviceType.value : '',
+        deviceModel: document.getElementById('deviceModel').value,
+        serialNumber: document.getElementById('serialNumber').value,
+        faultDescription: document.getElementById('faultDescription').value
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result === 'success') {
+          const ticketNum = data.ticketNumber;
+          alert("Success! Your Ticket Number is: " + ticketNum);
+
+          const message = encodeURIComponent(`Hello SKY TECHNOLOGIES, I have submitted a diagnostic form.\n\nTicket Number: ${ticketNum}\nName: ${formData.customerName}\nPhone: ${formData.phoneNumber}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nS/N: ${formData.serialNumber}\nFault: ${formData.faultDescription}`);
+          
+          window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
+        } else {
+          alert("Error submitting form: " + (data.error || "Unknown error"));
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'SUBMIT FORM';
+        }
+      })
+      .catch(error => {
+        console.error('Error!', error.message);
+        alert("Something went wrong. Please try again.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'SUBMIT FORM';
+      });
     });
-</script>
-
+  </script>
 </body>
 </html>
