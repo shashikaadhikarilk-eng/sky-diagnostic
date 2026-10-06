@@ -87,6 +87,8 @@
       { id: "Delivered", title: "Delivered", color: "border-gray-600" }
     ];
 
+    let globalTickets = [];
+
     function formatTicketNumber(val, rowIndex) {
       if (val && val.toString().trim() !== "") {
         let cleanVal = val.toString().trim();
@@ -95,7 +97,31 @@
       return `SKY-TICK-${1000 + (rowIndex - 1)}`;
     }
 
-    // Trilingual WhatsApp Message Generator (Sinhala + English + Tamil in ONE Message)
+    // Status එක Google Sheet එකේ Update කිරීම සහ Board එකේ අදාළ Column එකට Card එක Move කිරීම
+    function updateTicketStatus(rowIndex, newStatus) {
+      // Local Array එකේ Status එක මාරු කිරීම
+      const item = globalTickets.find(t => t.rowIndex === rowIndex);
+      if (item) {
+        item.status = newStatus;
+      }
+
+      // Board එක නැවත Render කිරීම (එවිට අදාළ column එකට වැටේ)
+      renderBoard(globalTickets);
+
+      // Google Sheet එක Update කිරීමට Backend එකට Request යැවීම
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-parse' },
+        body: JSON.stringify({ action: 'updateStatus', rowIndex: rowIndex, status: newStatus })
+      })
+      .then(() => {
+        console.log("Status Updated Successfully in Google Sheet");
+      })
+      .catch(err => console.error("Error updating status:", err));
+    }
+
+    // Trilingual WhatsApp Message Sender
     function sendWhatsAppUpdate(phone, name, ticketId, device, statusSelectId) {
       const selectedStatus = document.getElementById(statusSelectId).value;
       let message = "";
@@ -173,7 +199,7 @@
         
         boardHtml += `
           <div class="w-72 sm:w-80 flex-shrink-0 bg-[#0d131d] border border-gray-800 rounded-xl flex flex-col h-full max-h-full">
-            <!-- Header -->
+            <!-- Column Header -->
             <div class="p-3 border-b border-gray-800 flex justify-between items-center bg-[#111822] rounded-t-xl">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full ${col.color.replace('border-', 'bg-')}"></span>
@@ -182,7 +208,7 @@
               <span class="text-xs bg-gray-800 text-green-400 px-2 py-0.5 rounded-full font-bold font-mono border border-gray-700">${tickets.length}</span>
             </div>
 
-            <!-- Tickets Scroll Area -->
+            <!-- Scroll Area -->
             <div class="p-2 flex-1 overflow-y-auto space-y-2.5 kanban-col-scroll">
         `;
 
@@ -207,11 +233,11 @@
                   <div class="text-gray-400 text-[11px] truncate mt-0.5"><i class="fa-solid fa-wrench text-gray-500 mr-1"></i> ${tk.faultDescription || '-'}</div>
                 </div>
 
-                <!-- Process Selector -->
+                <!-- Process Selector with onChange event -->
                 <div class="pt-2 border-t border-gray-800/60 space-y-2">
                   <div>
                     <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Process State:</label>
-                    <select id="${selectId}" class="w-full bg-black/80 border border-green-900/60 text-green-300 text-[11px] rounded p-1 focus:outline-none focus:border-green-500 font-sans">
+                    <select id="${selectId}" onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-black/80 border border-green-900/60 text-green-300 text-[11px] rounded p-1 focus:outline-none focus:border-green-500 font-sans cursor-pointer">
                       ${columnsBase.map(c => `
                         <option value="${c.id}" ${c.id === col.id ? 'selected' : ''}>
                           ${c.title}
@@ -223,7 +249,6 @@
                   <div class="flex justify-between items-center gap-2 pt-1">
                     <span class="text-[10px] text-gray-400 font-mono"><i class="fa-solid fa-phone mr-1"></i>${phone}</span>
 
-                    <!-- WhatsApp Button -->
                     <button onclick="sendWhatsAppUpdate('${phone}', '${customer.replace(/'/g, "\\'")}', '${ticketId}', '${tk.deviceType}', '${selectId}')" 
                             class="bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/40 font-bold px-2 py-1 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
                       <i class="fa-brands fa-whatsapp text-xs"></i> SEND MSG
@@ -256,7 +281,8 @@
       fetch(scriptURL)
         .then(res => res.json())
         .then(data => {
-          renderBoard(data);
+          globalTickets = data;
+          renderBoard(globalTickets);
         })
         .catch(err => {
           console.error(err);
