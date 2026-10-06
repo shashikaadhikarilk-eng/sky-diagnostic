@@ -65,7 +65,7 @@
     <!-- Mobile View Filter Tabs -->
     <div class="md:hidden flex overflow-x-auto gap-2 pb-2 text-xs font-bold">
       <button onclick="switchMobileTab('col-new-wrapper')" class="bg-cyan-950 border border-cyan-500/50 text-cyan-400 px-3 py-2 rounded-lg whitespace-nowrap">🆕 New (<span id="mob-count-new">0</span>)</button>
-      <button onclick="switchMobileTab('col-process-wrapper')" class="bg-yellow-950 border border-yellow-500/50 text-yellow-400 px-3 py-2 rounded-lg whitespace-nowrap">⚙️️ Process (<span id="mob-count-process">0</span>)</button>
+      <button onclick="switchMobileTab('col-process-wrapper')" class="bg-yellow-950 border border-yellow-500/50 text-yellow-400 px-3 py-2 rounded-lg whitespace-nowrap">⚙️ Process (<span id="mob-count-process">0</span>)</button>
       <button onclick="switchMobileTab('col-parts-wrapper')" class="bg-orange-950 border border-orange-500/50 text-orange-400 px-3 py-2 rounded-lg whitespace-nowrap">⏳ Parts (<span id="mob-count-parts">0</span>)</button>
       <button onclick="switchMobileTab('col-ready-wrapper')" class="bg-green-950 border border-green-500/50 text-green-400 px-3 py-2 rounded-lg whitespace-nowrap">✅ Ready (<span id="mob-count-ready">0</span>)</button>
       <button onclick="switchMobileTab('col-completed-wrapper')" class="bg-slate-900 border border-slate-600/50 text-slate-400 px-3 py-2 rounded-lg whitespace-nowrap">🏁 Done (<span id="mob-count-completed">0</span>)</button>
@@ -122,7 +122,7 @@
   <div id="whatsappModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="sky-glass-card max-w-lg w-full rounded-2xl p-6 space-y-4 border border-green-500/50 shadow-2xl">
       <div class="flex justify-between items-center border-b border-green-900/50 pb-3">
-        <h3 class="font-brand text-green-400 font-bold text-sm">💬 WHATSAPP CHAT</h3>
+        <h3 class="font-brand text-green-400 font-bold text-sm">💬 WHATSAPP DIRECT CHAT</h3>
         <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-lg">✕</button>
       </div>
       <div class="space-y-2 text-xs">
@@ -130,8 +130,8 @@
         <div class="text-gray-300">Phone: <span id="modalPhoneNumber" class="text-cyan-400 font-mono font-bold"></span></div>
       </div>
       <div>
-        <label class="block text-xs text-gray-400 mb-1 font-semibold">EDIT MESSAGE:</label>
-        <textarea id="modalMsgText" rows="6" class="w-full bg-black text-green-300 border border-green-900 rounded-xl p-3 text-xs outline-none font-sans leading-relaxed"></textarea>
+        <label class="block text-xs text-gray-400 mb-1 font-semibold">EDIT MESSAGE / පණිවිඩය වෙනස් කරන්න:</label>
+        <textarea id="modalMsgText" rows="8" class="w-full bg-black text-green-300 border border-green-900 rounded-xl p-3 text-xs outline-none font-sans leading-relaxed"></textarea>
       </div>
       <div class="flex gap-3">
         <button onclick="closeWaModal()" class="w-1/3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2.5 rounded-xl text-xs">CANCEL</button>
@@ -173,23 +173,13 @@
       location.reload();
     }
 
-    // Clean Date Formatter (Removes Timezone text like India Standard Time)
-    function formatDate(dateStr) {
-      if(!dateStr) return '';
-      // clean string if raw string contains timezone names
-      let cleanStr = dateStr.toString().replace(/\(.*\)/, '').replace(/GMT[+-]\d+/, '').trim();
-      const d = new Date(cleanStr);
-      if(isNaN(d.getTime())) return cleanStr;
-      
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      let hours = d.getHours();
-      const minutes = String(d.getMinutes()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12 || 12;
-
-      return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
+    function cleanTicketNumber(val, rowIndex) {
+      if(!val) return `SKY-${rowIndex}`;
+      let s = val.toString().trim();
+      if (s.length > 15 || s.includes('Oct') || s.includes('Sep') || s.includes('2026') || s.includes('Mon') || s.includes('GMT') || s.includes('India')) {
+        return `SKY-${rowIndex}`;
+      }
+      return s;
     }
 
     function fetchTickets() {
@@ -228,20 +218,19 @@
 
         cols[currentStatus].count++;
 
-        const formattedDate = formatDate(t.timestamp || t.date);
+        const displayTicket = cleanTicketNumber(t.ticketNumber, t.rowIndex);
 
         const card = document.createElement('div');
         card.className = 'ticket-card rounded-xl p-3.5 space-y-2 text-xs relative';
         card.innerHTML = `
           <div class="flex justify-between items-center">
-            <span class="font-brand text-green-400 font-bold">${t.ticketNumber}</span>
+            <span class="font-brand text-green-400 font-bold">${displayTicket}</span>
             <span class="bg-black border border-green-900/50 text-cyan-300 text-[10px] px-2 py-0.5 rounded">${t.deviceType}</span>
           </div>
           <div class="text-sm font-bold text-white">${t.customerName}</div>
           <div class="text-cyan-300 font-mono">📞 ${t.phoneNumber}</div>
           <div class="text-gray-300"><span class="text-gray-400">Model:</span> ${t.deviceModel}</div>
           <div class="text-gray-400 font-mono text-[11px]"><span class="text-gray-500">S/N:</span> ${t.serialNumber}</div>
-          ${formattedDate ? `<div class="text-gray-400 text-[10px]">📅 ${formattedDate}</div>` : ''}
           <div class="p-2 bg-black/50 border border-red-900/30 rounded-lg text-amber-300/90 text-[11px]">
             <span class="font-bold text-red-400">Fault:</span> ${t.faultDescription}
           </div>
@@ -256,7 +245,7 @@
                 <option value="Completed" ${currentStatus === 'Completed' ? 'selected' : ''}>🏁 Completed</option>
               </select>
             </div>
-            <button onclick="openWaModal('${t.phoneNumber}', '${t.customerName}', '${t.ticketNumber}', '${currentStatus}', '${t.deviceModel}')" 
+            <button onclick="openWaModal('${t.phoneNumber}', '${t.customerName}', '${displayTicket}', '${currentStatus}', '${t.deviceModel}')" 
                     class="w-full font-bold bg-green-500/20 border border-green-500/50 hover:bg-green-500 hover:text-black text-green-300 py-2 rounded-lg transition text-[11px] flex items-center justify-center gap-1.5 cursor-pointer">
               💬 QUICK WHATSAPP CHAT
             </button>
@@ -282,6 +271,7 @@
       });
     }
 
+    // TRILINGUAL WHATSAPP MESSAGES WITH SRI LANKA STANDARD TIME REFERENCE
     function openWaModal(phone, name, ticket, status, model) {
       let cleanPhone = phone.replace(/[^0-9]/g, '');
       if (cleanPhone.startsWith('0')) cleanPhone = '94' + cleanPhone.substring(1);
@@ -289,7 +279,44 @@
       document.getElementById('modalCustomerName').innerText = name;
       document.getElementById('modalPhoneNumber').innerText = phone;
 
-      let statusMsg = `🛠️ *SKY TECHNOLOGIES STATUS UPDATE*\n\nHello ${name},\nYour device (${model}) under Ticket *${ticket}* Status: *${status}*.\n\nඔබගේ උපකරණයේ වර්තමාන තත්ත්වය: ${status}`;
+      let statusMsg = "";
+
+      if (status === "In Process") {
+        statusMsg = `🛠️ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
+                    `Hello ${name},\nYour device (${model}) under Ticket *${ticket}* is now *IN PROCESS*.\n\n` +
+                    `ඔබගේ උපකරණයේ (${model}) අලුත්වැඩියා කටයුතු ආරම්භ කරන ලදී. (ටිකට් අංකය: ${ticket})\n\n` +
+                    `உங்கள் சாதனம் (${model}) பரிசோதிக்கப்பட்டு வருகிறது. (டிக்கெட்: ${ticket})`;
+      } 
+      else if (status === "Parts Pending") {
+        statusMsg = `⏳ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
+                    `Hello ${name},\nYour device (${model}) under Ticket *${ticket}* status: *PARTS PENDING*.\n\n` +
+                    `ඔබගේ උපකරණය (${model}) සඳහා අමතර කොටස් ලබාගැනීමට ඇති බැවින් තරමක් ප්‍රමාද වේ. (ටිකට් අංකය: ${ticket})\n\n` +
+                    `உங்கள் சாதனத்திற்கு (${model}) உதிரி பாகங்கள் தேவைப்படுகின்றன. (டிக்கெட்: ${ticket})`;
+      } 
+      else if (status === "Ready For Pickup") {
+        statusMsg = `✅ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
+                    `Hello ${name},\nGreat news! Your device (${model}) under Ticket *${ticket}* is *READY FOR PICKUP*!\n\n` +
+                    `ඔබගේ උපකරණය (${model}) සාදා නිමකර ඇති අතර, පැමිණ ලබාගත හැක. (ටිකට් අංකය: ${ticket})\n\n` +
+                    `உங்கள் சாதனம் (${model}) தயாராக உள்ளது. வந்து பெற்றுக்கொள்ளலாம். (டிக்கெட்: ${ticket})`;
+      } 
+      else if (status === "Completed") {
+        statusMsg = `🏁 *SKY TECHNOLOGIES*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
+                    `Hello ${name},\nTicket *${ticket}* (${model}) is marked as Completed. Thank you!\n\n` +
+                    `SKY TECHNOLOGIES වෙතින් සේවාව ලබාගැනීම ගැන ස්තූතියි! (ටිකට් අංකය: ${ticket})\n\n` +
+                    `SKY TECHNOLOGIES தேர்வு செய்ததற்கு நன்றி! (டிக்கெட்: ${ticket})`;
+      } 
+      else {
+        statusMsg = `ℹ️ *SKY TECHNOLOGIES*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
+                    `Hello ${name},\nYour Ticket *${ticket}* Status: *${status}*.\n\n` +
+                    `ඔබගේ ටිකට්පත් තත්ත්වය: ${status}\n\n` +
+                    `உங்கள் டிக்கெட் நிலை: ${status}`;
+      }
+
       document.getElementById('modalMsgText').value = statusMsg;
       document.getElementById('whatsappModal').classList.remove('hidden');
     }
