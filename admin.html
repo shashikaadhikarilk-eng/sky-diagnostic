@@ -173,35 +173,21 @@
       location.reload();
     }
 
-    function formatTicketNumber(val, rowIndex) {
-      let rIndex = parseInt(rowIndex) || 2;
-      let calculatedNum = `SKY-TICK-${1003 + rIndex}`;
+    // Google Sheet එකේ ඇති පිළිවෙල අනුව (Index 0 නම් 1005, Index 1 නම් 1006)
+    function formatTicketNumber(val, arrayIndex) {
+      let idx = parseInt(arrayIndex) || 0;
+      let calculatedNum = `SKY-TICK-${1005 + idx}`;
 
       if (!val) return calculatedNum;
       
       let s = val.toString().trim();
 
+      // 이미 SKY-TICK-1005 වැනි නිවැරදි Format එකක් ඇත්නම් එයම පෙන්වන්න
       if (/^SKY-TICK-\d{4,}$/i.test(s)) {
         return s.toUpperCase();
       }
 
-      if (s.startsWith('SKY-')) {
-        let digits = s.replace(/[^0-9]/g, '');
-        if (digits) {
-          let n = parseInt(digits);
-          return n >= 1000 ? `SKY-TICK-${n}` : `SKY-TICK-${1004 + n}`;
-        }
-      }
-
-      if (s.length > 12 || isNaN(s) && !s.includes('SKY')) {
-        return calculatedNum;
-      }
-
-      if (!isNaN(s)) {
-        let n = parseInt(s);
-        return n >= 1000 ? `SKY-TICK-${n}` : `SKY-TICK-${1004 + n}`;
-      }
-
+      // හිස් හෝ නොගැලපෙන අගයක් ආවොත් සූත්‍රගත අංකය ලබා දෙන්න
       return calculatedNum;
     }
 
@@ -235,14 +221,19 @@
 
       if(!Array.isArray(tickets)) return;
 
-      // reverse() නොමැතිව original order එකටම render වේ
-      tickets.forEach(t => {
+      // index අගය (0, 1, 2...) ලබාගෙන Ticket Number එක හරියටම පවරයි
+      tickets.forEach((t, index) => {
         const currentStatus = t.status || 'New Ticket';
         if (!cols[currentStatus]) return;
 
         cols[currentStatus].count++;
 
-        const displayTicket = formatTicketNumber(t.ticketNumber, t.rowIndex);
+        // index 0 -> SKY-TICK-1005
+        // index 1 -> SKY-TICK-1006
+        const displayTicket = formatTicketNumber(t.ticketNumber, index);
+
+        // Google Sheet එකේ Update කිරීමට අවශ්‍ය Actual Row Index එක (Header Row එක නිසා index + 2)
+        const sheetRowIndex = t.rowIndex || (index + 2);
 
         const card = document.createElement('div');
         card.className = 'ticket-card rounded-xl p-3.5 space-y-2 text-xs relative';
@@ -261,7 +252,7 @@
           <div class="pt-2 border-t border-green-900/30 space-y-2">
             <div>
               <label class="block text-[10px] text-gray-400 mb-1 font-semibold">CHANGE STATUS:</label>
-              <select onchange="updateStatus(${t.rowIndex}, this.value)" class="w-full bg-black text-cyan-300 border border-green-900/60 rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer">
+              <select onchange="updateStatus(${sheetRowIndex}, this.value)" class="w-full bg-black text-cyan-300 border border-green-900/60 rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer">
                 <option value="New Ticket" ${currentStatus === 'New Ticket' ? 'selected' : ''}>🆕 New Ticket</option>
                 <option value="In Process" ${currentStatus === 'In Process' ? 'selected' : ''}>⚙️ In Process</option>
                 <option value="Parts Pending" ${currentStatus === 'Parts Pending' ? 'selected' : ''}>⏳ Parts Pending</option>
