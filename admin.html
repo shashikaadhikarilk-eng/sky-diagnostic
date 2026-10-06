@@ -173,22 +173,18 @@
       location.reload();
     }
 
-    // Row 2 (පළමු දත්ත පේළිය) SKY-TICK-1005 ලෙස ආරම්භ කිරීමේ නිවැරදි Logic එක
     function formatTicketNumber(val, rowIndex) {
       let rIndex = parseInt(rowIndex) || 2;
-      // Row 2 නම්: 1003 + 2 = 1005 | Row 3 නම්: 1003 + 3 = 1006
       let calculatedNum = `SKY-TICK-${1003 + rIndex}`;
 
       if (!val) return calculatedNum;
       
       let s = val.toString().trim();
 
-      // නිවැරදිව SKY-TICK-1005 වැනි අගයක් ඇත්නම් එයම පවත්වා ගනී
       if (/^SKY-TICK-\d{4,}$/i.test(s)) {
         return s.toUpperCase();
       }
 
-      // SKY-1, SKY-2 වැනි පැරණි Format එකක් ඇත්නම් 1004+එකතු කර 1005+ බවට හරවයි
       if (s.startsWith('SKY-')) {
         let digits = s.replace(/[^0-9]/g, '');
         if (digits) {
@@ -197,12 +193,10 @@
         }
       }
 
-      // Date strings හෝ දිගු ලිපිනයන් අඩංගු අගයන් ආවොත් සූත්‍රගත Ticket අංකය දෙයි
       if (s.length > 12 || isNaN(s) && !s.includes('SKY')) {
         return calculatedNum;
       }
 
-      // 1, 2, 3 වැනි තනි ඉලක්කම් පමණක් ඇත්නම්
       if (!isNaN(s)) {
         let n = parseInt(s);
         return n >= 1000 ? `SKY-TICK-${n}` : `SKY-TICK-${1004 + n}`;
@@ -241,7 +235,8 @@
 
       if(!Array.isArray(tickets)) return;
 
-      tickets.reverse().forEach(t => {
+      // reverse() නොමැතිව original order එකටම render වේ
+      tickets.forEach(t => {
         const currentStatus = t.status || 'New Ticket';
         if (!cols[currentStatus]) return;
 
