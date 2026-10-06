@@ -3,225 +3,290 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SKY TECHNOLOGIES - Diagnostic Form</title>
+  <title>SKY TECHNOLOGIES - Helpdesk Kanban Board</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     body {
       font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
-      background: radial-gradient(circle at top, #0b140d 0%, #05080a 50%, #020304 100%);
-      min-height: 100vh;
+      background: #090d12;
       color: #e2e8f0;
+      min-height: 100vh;
     }
     .font-brand { font-family: 'Orbitron', sans-serif; }
-    .sky-glass-card {
-      background: rgba(10, 18, 14, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
-      border-radius: 16px;
+    
+    .kanban-col-scroll::-webkit-scrollbar {
+      width: 5px;
     }
-    .logo-glow-ring { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
-    .neon-top-bar {
-      background: linear-gradient(90deg, #22c55e, #06b6d4, #10b981);
-      height: 4px;
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
+    .kanban-col-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
     }
-    .sky-input {
-      background: rgba(5, 12, 8, 0.7);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #38bdf8;
-      border-radius: 8px;
+    .kanban-col-scroll::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
     }
-    .sky-input:focus {
-      outline: none;
+
+    .ticket-card {
+      background: #111822;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease-in-out;
+    }
+    .ticket-card:hover {
       border-color: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-      background: rgba(8, 20, 13, 0.9);
-      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-    input[type="radio"] { accent-color: #22c55e; }
+    .logo-glow {
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
   </style>
 </head>
-<body class="py-10 px-4 sm:px-6">
+<body class="p-3 sm:p-5 flex flex-col h-screen overflow-hidden">
 
-  <div class="max-w-2xl mx-auto space-y-6 relative z-10">
-    <!-- Header Card -->
-    <div class="sky-glass-card overflow-hidden">
-      <div class="neon-top-bar"></div>
-      <div class="p-6 sm:p-8">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b border-green-900/40">
-          <div class="text-center sm:text-left order-2 sm:order-1">
-            <h1 class="font-brand text-2xl sm:text-3xl font-extrabold text-white tracking-wider">
-              SKY <span class="text-green-500">TECHNOLOGIES</span>
-            </h1>
-            <p class="text-xs sm:text-sm font-semibold tracking-widest text-cyan-400 uppercase mt-1">
-              Repair & Diagnostic Request Form
-            </p>
-          </div>
-          <div class="order-1 sm:order-2 flex-shrink-0">
-            <div class="w-24 h-24 rounded-full bg-black border-2 border-green-500 logo-glow-ring flex items-center justify-center overflow-hidden">
-              <img src="logo.png" alt="SKY TECHNOLOGIES Logo" class="w-full h-full object-cover rounded-full">
-            </div>
-          </div>
-        </div>
-
-        <!-- Trilingual Description -->
-        <div class="mt-4 space-y-1.5 text-xs sm:text-sm text-gray-300">
-          <p><span class="text-green-400">❖</span> Submit your device diagnostic details below.</p>
-          <p><span class="text-cyan-400">❖</span> ඔබගේ පරිගණක/ලැප්ටොප් අලුත්වැඩියා විස්තර ඇතුළත් කරන්න.</p>
-          <p><span class="text-emerald-400">❖</span> உங்கள் சாதனத்தின் பழுதுபார்ப்பு விவரங்களை கீழே சமர்ப்பிக்கவும்.</p>
-        </div>
+  <!-- Header Section -->
+  <header class="bg-[#111822] border border-gray-800 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-black border border-green-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
+        <img src="logo.png" alt="SKY Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span class="hidden font-brand text-green-400 font-bold text-xs">SKY</span>
+      </div>
+      <div>
+        <h1 class="font-brand text-base sm:text-lg font-bold text-white tracking-wider flex items-center gap-2">
+          SKY <span class="text-green-500">TECHNOLOGIES</span>
+        </h1>
+        <p class="text-[10px] sm:text-xs text-cyan-400 font-semibold tracking-wider">HELPDESK KANBAN BOARD</p>
       </div>
     </div>
 
-    <!-- Diagnostic Form Card -->
-    <div class="sky-glass-card p-6 sm:p-8">
-      <form id="diagnosticForm" class="space-y-5">
+    <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 text-black text-xs font-bold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow transition flex items-center gap-2 cursor-pointer">
+      <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
+    </button>
+  </header>
 
-        <!-- Customer Name -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-1">Customer Name / නම / பெயர் *</label>
-          <input type="text" id="customerName" required placeholder="John Doe" class="w-full p-3 sky-input text-sm">
-        </div>
-
-        <!-- Phone Number -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-1">Phone Number (WhatsApp) / දුරකථන අංකය / தொலைபேசி எண் *</label>
-          <input type="tel" id="phoneNumber" required placeholder="07X XXX XXXX" class="w-full p-3 sky-input text-sm">
-        </div>
-
-        <!-- Device Type -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-2">Device Type / උපකරණ වර්ගය / சாதன வகை *</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-green-900/50 bg-black/40 cursor-pointer hover:border-green-500 transition">
-              <input type="radio" name="deviceType" value="Laptop" checked> Laptop
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-green-900/50 bg-black/40 cursor-pointer hover:border-green-500 transition">
-              <input type="radio" name="deviceType" value="Desktop PC"> PC / Desktop
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-green-900/50 bg-black/40 cursor-pointer hover:border-green-500 transition">
-              <input type="radio" name="deviceType" value="Motherboard"> Motherboard
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-green-900/50 bg-black/40 cursor-pointer hover:border-green-500 transition">
-              <input type="radio" name="deviceType" value="Other"> Other
-            </label>
-          </div>
-        </div>
-
-        <!-- Device Model & Brand -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-1">Device Model & Brand / මාදිලිය සහ නිෂ්පාදකයා / மாதிரி *</label>
-          <input type="text" id="deviceModel" required placeholder="ASUS TUF FX505 / Dell OptiPlex" class="w-full p-3 sky-input text-sm">
-        </div>
-
-        <!-- Serial Number -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-1">Serial Number (Optional) / අනුක්‍රමික අංකය / தொடர் எண்</label>
-          <input type="text" id="serialNumber" placeholder="S/N Number" class="w-full p-3 sky-input text-sm">
-        </div>
-
-        <!-- Fault Description -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-200 mb-1">Fault / Issue Description / දෝෂය / பழுது விவரம் *</label>
-          <textarea id="faultDescription" rows="4" required placeholder="No Power / No Display / Overheating / Thermal issue..." class="w-full p-3 sky-input text-sm"></textarea>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" id="submitBtn" class="w-full py-4 rounded-xl font-brand font-bold text-black bg-gradient-to-r from-green-500 via-emerald-400 to-cyan-500 hover:from-green-400 hover:to-cyan-400 transition shadow-lg shadow-green-900/40 text-base uppercase tracking-wider cursor-pointer">
-          SUBMIT DIAGNOSTIC REQUEST
-        </button>
-      </form>
-
-      <!-- Status Result Box -->
-      <div id="resultBox" class="hidden mt-6 p-6 rounded-xl border bg-black/80 text-center space-y-3">
-        <div id="resultIcon" class="text-4xl"></div>
-        <h3 id="resultTitle" class="font-brand text-lg font-bold"></h3>
-        <p id="resultMessage" class="text-sm text-gray-300"></p>
-        <div id="ticketContainer" class="hidden pt-3 border-t border-gray-800">
-          <span class="text-xs uppercase tracking-widest text-gray-400">Your Diagnostic Ticket ID:</span>
-          <div id="ticketNumberDisplay" class="font-brand text-2xl text-green-400 font-extrabold mt-1"></div>
-        </div>
-      </div>
+  <!-- Kanban Columns Container -->
+  <main id="kanbanBoard" class="flex-1 flex gap-3 sm:gap-4 overflow-x-auto pb-2 items-start h-full">
+    <div class="w-full text-center py-20 text-gray-500 font-brand">
+      <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
+      <p>LOADING HELPDESK TICKETS...</p>
     </div>
-  </div>
+  </main>
 
   <script>
-    // අලුත් Web App URL එක
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwRSSSQZCjOTuZwHltkFUOw1qA7Ib74zDBKr_RmcVPbusBxu0Hekf6cC6NT9E1-Xz-DOg/exec';
+    // Updated Google Apps Script Web App URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx2_Sz-XYIJNZcNpsyao52k1IMzCcRALuMiOUQdEfmQ6UpQCDTuHPilIGDw3E6gHMTjTw/exec';
 
-    const form = document.getElementById('diagnosticForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const resultBox = document.getElementById('resultBox');
-    const resultIcon = document.getElementById('resultIcon');
-    const resultTitle = document.getElementById('resultTitle');
-    const resultMessage = document.getElementById('resultMessage');
-    const ticketContainer = document.getElementById('ticketContainer');
-    const ticketNumberDisplay = document.getElementById('ticketNumberDisplay');
+    const columnsBase = [
+      { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
+      { id: "In Process", title: "In Process", color: "border-yellow-500" },
+      { id: "On Hold", title: "On Hold", color: "border-purple-500" },
+      { id: "Parts Pending", title: "Parts Pending", color: "border-orange-500" },
+      { id: "Ready For Collect", title: "Ready For Collect", color: "border-emerald-500" },
+      { id: "Delivered", title: "Delivered", color: "border-gray-600" }
+    ];
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
+    let globalTickets = [];
 
-      // Submit කිරීමේදී Button එක Disable කිරීම
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'SUBMITTING DETAILS...';
-      resultBox.classList.add('hidden');
+    function formatTicketNumber(val, rowIndex) {
+      if (val && val.toString().trim() !== "") {
+        let cleanVal = val.toString().trim();
+        return cleanVal.startsWith('SKY-TICK-') ? cleanVal : `SKY-TICK-${cleanVal}`;
+      }
+      return `SKY-TICK-${1000 + (rowIndex - 1)}`;
+    }
 
-      const selectedDevice = document.querySelector('input[name="deviceType"]:checked').value;
+    function updateTicketStatus(rowIndex, newStatus) {
+      const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
+      if (ticket) {
+        ticket.status = newStatus;
+      }
 
-      const payload = {
-        customerName: document.getElementById('customerName').value.trim(),
-        phoneNumber: document.getElementById('phoneNumber').value.trim(),
-        deviceType: selectedDevice,
-        deviceModel: document.getElementById('deviceModel').value.trim(),
-        serialNumber: document.getElementById('serialNumber').value.trim() || '-',
-        faultDescription: document.getElementById('faultDescription').value.trim()
-      };
+      // Local UI instant update
+      renderBoard(globalTickets);
 
+      // Backend Google Sheet target row update
       fetch(scriptURL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ 
+          action: 'updateStatus', 
+          rowIndex: rowIndex, 
+          status: newStatus 
+        })
       })
       .then(res => res.json())
-      .then(response => {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'SUBMIT DIAGNOSTIC REQUEST';
-        resultBox.classList.remove('hidden');
+      .then(data => console.log("Status updated successfully:", data))
+      .catch(err => console.error("Error updating status:", err));
+    }
 
-        if (response.result === 'success') {
-          resultBox.className = 'mt-6 p-6 rounded-xl border border-green-500/50 bg-green-950/40 text-center space-y-3';
-          resultIcon.innerText = '✅';
-          resultTitle.className = 'font-brand text-lg font-bold text-green-400';
-          resultTitle.innerText = 'REQUEST SUBMITTED SUCCESSFULLY!';
-          resultMessage.innerText = 'ඔබගේ අලුත්වැඩියා තොරතුරු සාර්ථකව ලැබුණි. පහත Ticket ID එක සුරක්ෂිතව තබා ගන්න.';
-          
-          ticketContainer.classList.remove('hidden');
-          ticketNumberDisplay.innerText = `SKY-TICK-${response.ticketNumber}`;
+    function sendWhatsAppUpdate(phone, name, ticketId, device, statusSelectId) {
+      const selectedStatus = document.getElementById(statusSelectId).value;
+      let message = "";
 
-          form.reset();
-        } else {
-          throw new Error(response.error || 'Unknown error occurred.');
-        }
-      })
-      .catch(error => {
-        console.error('Error!', error.message);
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'SUBMIT DIAGNOSTIC REQUEST';
-        resultBox.classList.remove('hidden');
-        resultBox.className = 'mt-6 p-6 rounded-xl border border-red-500/50 bg-red-950/40 text-center space-y-3';
-        resultIcon.innerText = '❌';
-        resultTitle.className = 'font-brand text-lg font-bold text-red-400';
-        resultTitle.innerText = 'SUBMISSION FAILED!';
-        resultMessage.innerText = 'තොරතුරු යැවීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.';
-        ticketContainer.classList.add('hidden');
+      switch(selectedStatus) {
+        case "In Process":
+          message = `🛠 *SKY TECHNOLOGIES - REPAIR UPDATE*\n\n` +
+                    `Hello ${name},\nYour device *${device}* (${ticketId}) is now *IN PROCESS* for repairs.\n---------------------------\n` +
+                    `ඔබගේ *${device}* උපකරණය (*${ticketId}*) අලුත්වැඩියා කිරීම ආරම්භ කර ඇත.\n---------------------------\n` +
+                    `உங்கள் சாதனம் *${device}* (*${ticketId}*) பழுதுபார்க்கத் தொடங்கப்பட்டுள்ளது.`;
+          break;
+
+        case "On Hold":
+          message = `⚠️ *SKY TECHNOLOGIES - ACTION REQUIRED*\n\n` +
+                    `Hello ${name},\nYour repair ticket *${ticketId}* (${device}) is placed *ON HOLD*. Please contact us.\n---------------------------\n` +
+                    `ඔබගේ *${device}* (*${ticketId}*) අලුත්වැඩියාව තාවකාලිකව රඳවා තබා ඇත. කරුණාකර අප හා සම්බන්ධ වන්න.\n---------------------------\n` +
+                    `உங்கள் பழுதுபார்ப்பு (*${ticketId}*) தற்காலிகமாக நிறுத்தப்பட்டுள்ளது. எங்களை தொடர்பு கொள்ளவும்.`;
+          break;
+
+        case "Parts Pending":
+          message = `📦 *SKY TECHNOLOGIES - PARTS UPDATE*\n\n` +
+                    `Hello ${name},\nYour device *${device}* (*${ticketId}*) is waiting for required spare parts.\n---------------------------\n` +
+                    `ඔබගේ *${device}* (*${ticketId}*) සඳහා අවශ්‍ය අමතර කොටස් ලැබෙන තෙක් රැඳී සිටී.\n---------------------------\n` +
+                    `உங்கள் சாதனத்திற்கு தேவையான உதிரிபாகங்கள் வர வேண்டியுள்ளது.`;
+          break;
+
+        case "Ready For Collect":
+          message = `✅ *SKY TECHNOLOGIES - READY FOR PICKUP*\n\n` +
+                    `Hello ${name},\nGood news! Your device *${device}* (*${ticketId}*) repair is *COMPLETED & READY FOR PICKUP*.\n📍 Visit: Sky Technologies Kadawatha.\n---------------------------\n` +
+                    `සුබ ආරංචියක්! ඔබගේ *${device}* (*${ticketId}*) අලුත්වැඩියා කර අවසන්. පැමිණ භාරගන්න.\n📍 ස්ථානය: Sky Technologies කඩවත.\n---------------------------\n` +
+                    `உங்கள் சாதனம் *${device}* (*${ticketId}*) பழுதுபார்க்கப்பட்டு தயாராக உள்ளது. வந்து பெற்றுக்கொள்ளலாம்.`;
+          break;
+
+        case "Delivered":
+          message = `🤝 *SKY TECHNOLOGIES - DELIVERED*\n\n` +
+                    `Hello ${name},\nYour device *${device}* (*${ticketId}*) has been delivered. Thank you for choosing us!\n---------------------------\n` +
+                    `ඔබගේ *${device}* (*${ticketId}*) සාර්ථකව භාර දෙන ලදී. අපගේ සේවාව ලබාගැනීම ගැන ස්තූතියි!\n---------------------------\n` +
+                    `உங்கள் சாதனம் ஒப்படைக்கப்பட்டது. நன்றி!`;
+          break;
+
+        default:
+          message = `ℹ️ *SKY TECHNOLOGIES - TICKET UPDATE*\n\n` +
+                    `Hello ${name},\nStatus for Ticket *${ticketId}* (${device}) updated to: *${selectedStatus}*.\n---------------------------\n` +
+                    `ඔබගේ ටිකට් අංක *${ticketId}* හි වත්මන් තත්ත්වය: *${selectedStatus}*.\n---------------------------\n` +
+                    `டிக்கெட் *${ticketId}* இன் தற்போதைய நிலை: *${selectedStatus}*.`;
+      }
+
+      const cleanPhone = phone.toString().replace(/[^0-9]/g, '');
+      const encodedMsg = encodeURIComponent(message);
+      window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`, '_blank');
+    }
+
+    function renderBoard(data) {
+      const board = document.getElementById('kanbanBoard');
+
+      if (!data || data.length === 0) {
+        board.innerHTML = `<div class="text-center w-full py-10 text-gray-400">No Tickets Found.</div>`;
+        return;
+      }
+
+      const grouped = {};
+      columnsBase.forEach(col => grouped[col.id] = []);
+
+      data.forEach(item => {
+        const rawStatus = (item.status || "New Ticket").trim();
+        const matchingCol = columnsBase.find(c => c.id.toLowerCase() === rawStatus.toLowerCase());
+        const targetCol = matchingCol ? matchingCol.id : "New Ticket";
+        grouped[targetCol].push(item);
       });
-    });
+
+      let boardHtml = "";
+
+      columnsBase.forEach(col => {
+        const tickets = grouped[col.id] || [];
+        
+        boardHtml += `
+          <div class="w-72 sm:w-80 flex-shrink-0 bg-[#0d131d] border border-gray-800 rounded-xl flex flex-col h-full max-h-full">
+            <div class="p-3 border-b border-gray-800 flex justify-between items-center bg-[#111822] rounded-t-xl">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full ${col.color.replace('border-', 'bg-')}"></span>
+                <h2 class="font-bold text-xs text-gray-200 tracking-wider">${col.title}</h2>
+              </div>
+              <span class="text-xs bg-gray-800 text-green-400 px-2 py-0.5 rounded-full font-bold font-mono border border-gray-700">${tickets.length}</span>
+            </div>
+
+            <div class="p-2 flex-1 overflow-y-auto space-y-2.5 kanban-col-scroll">
+        `;
+
+        if (tickets.length === 0) {
+          boardHtml += `<div class="text-center py-8 text-gray-600 text-xs italic">No tickets in this column</div>`;
+        } else {
+          tickets.slice().reverse().forEach((tk) => {
+            const ticketId = formatTicketNumber(tk.ticketNumber, tk.rowIndex);
+            const customer = tk.customerName || "Unknown Customer";
+            const phone = tk.phoneNumber || "";
+            const device = `${tk.deviceType || 'Device'} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`;
+            const selectId = `status-select-${tk.rowIndex}`;
+
+            boardHtml += `
+              <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs">
+                <div>
+                  <div class="flex justify-between items-start gap-2 mb-1">
+                    <span class="font-brand font-extrabold text-green-400 text-xs sm:text-sm tracking-wide">${device}</span>
+                  </div>
+                  <div class="text-gray-400 text-[10px] sm:text-[11px] font-mono">${ticketId}</div>
+                  <div class="text-white font-semibold mt-1 text-xs">${customer}</div>
+                  <div class="text-gray-400 text-[11px] truncate mt-0.5"><i class="fa-solid fa-wrench text-gray-500 mr-1"></i> ${tk.faultDescription || '-'}</div>
+                </div>
+
+                <div class="pt-2 border-t border-gray-800/60 space-y-2">
+                  <div>
+                    <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Process State:</label>
+                    <select id="${selectId}" onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-black/80 border border-green-900/60 text-green-300 text-[11px] rounded p-1 focus:outline-none focus:border-green-500 font-sans cursor-pointer">
+                      ${columnsBase.map(c => `
+                        <option value="${c.id}" ${c.id === col.id ? 'selected' : ''}>
+                          ${c.title}
+                        </option>
+                      `).join('')}
+                    </select>
+                  </div>
+
+                  <div class="flex justify-between items-center gap-2 pt-1">
+                    <span class="text-[10px] text-gray-400 font-mono"><i class="fa-solid fa-phone mr-1"></i>${phone}</span>
+
+                    <button onclick="sendWhatsAppUpdate('${phone}', '${customer.replace(/'/g, "\\'")}', '${ticketId}', '${tk.deviceType}', '${selectId}')" 
+                            class="bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/40 font-bold px-2 py-1 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
+                      <i class="fa-brands fa-whatsapp text-xs"></i> SEND MSG
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        boardHtml += `
+            </div>
+          </div>
+        `;
+      });
+
+      board.innerHTML = boardHtml;
+    }
+
+    function fetchTickets() {
+      const board = document.getElementById('kanbanBoard');
+
+      board.innerHTML = `
+        <div class="w-full text-center py-20 text-gray-500 font-brand">
+          <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
+          <p>FETCHING LATEST HELPDESK TICKETS...</p>
+        </div>`;
+
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          globalTickets = data;
+          renderBoard(globalTickets);
+        })
+        .catch(err => {
+          console.error(err);
+          board.innerHTML = `<div class="text-center w-full py-10 text-red-400">Failed to load tickets. Please check Web App URL.</div>`;
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchTickets);
   </script>
 </body>
 </html>
