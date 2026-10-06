@@ -65,7 +65,7 @@
     <!-- Mobile View Filter Tabs -->
     <div class="md:hidden flex overflow-x-auto gap-2 pb-2 text-xs font-bold">
       <button onclick="switchMobileTab('col-new-wrapper')" class="bg-cyan-950 border border-cyan-500/50 text-cyan-400 px-3 py-2 rounded-lg whitespace-nowrap">🆕 New (<span id="mob-count-new">0</span>)</button>
-      <button onclick="switchMobileTab('col-process-wrapper')" class="bg-yellow-950 border border-yellow-500/50 text-yellow-400 px-3 py-2 rounded-lg whitespace-nowrap">⚙️ Process (<span id="mob-count-process">0</span>)</button>
+      <button onclick="switchMobileTab('col-process-wrapper')" class="bg-yellow-950 border border-yellow-500/50 text-yellow-400 px-3 py-2 rounded-lg whitespace-nowrap">⚙️️ Process (<span id="mob-count-process">0</span>)</button>
       <button onclick="switchMobileTab('col-parts-wrapper')" class="bg-orange-950 border border-orange-500/50 text-orange-400 px-3 py-2 rounded-lg whitespace-nowrap">⏳ Parts (<span id="mob-count-parts">0</span>)</button>
       <button onclick="switchMobileTab('col-ready-wrapper')" class="bg-green-950 border border-green-500/50 text-green-400 px-3 py-2 rounded-lg whitespace-nowrap">✅ Ready (<span id="mob-count-ready">0</span>)</button>
       <button onclick="switchMobileTab('col-completed-wrapper')" class="bg-slate-900 border border-slate-600/50 text-slate-400 px-3 py-2 rounded-lg whitespace-nowrap">🏁 Done (<span id="mob-count-completed">0</span>)</button>
@@ -173,11 +173,23 @@
       location.reload();
     }
 
+    // Clean Date Formatter (Removes Timezone text like India Standard Time)
     function formatDate(dateStr) {
       if(!dateStr) return '';
-      const d = new Date(dateStr);
-      if(isNaN(d.getTime())) return dateStr;
-      return d.toLocaleString('en-GB', { timeZone: 'Asia/Colombo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+      // clean string if raw string contains timezone names
+      let cleanStr = dateStr.toString().replace(/\(.*\)/, '').replace(/GMT[+-]\d+/, '').trim();
+      const d = new Date(cleanStr);
+      if(isNaN(d.getTime())) return cleanStr;
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+
+      return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
     }
 
     function fetchTickets() {
