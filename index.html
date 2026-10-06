@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SKY TECHNOLOGIES - Book Repair Service & Live Tracker</title>
+  <title>SKY TECHNOLOGIES - Repair Helpdesk & Live Tracker</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- PDF Generator Library -->
@@ -14,7 +14,7 @@
 
   <style>
     body {
-      font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
+      font-family: 'Rajdhani', 'Noto Sans Sinhala', sans-serif;
       background: #090d12;
       color: #e2e8f0;
       min-height: 100vh;
@@ -48,7 +48,7 @@
 
   <div class="w-full max-w-xl glass-card rounded-2xl p-5 sm:p-8 my-4">
     
-    <!-- Header / Brand Section -->
+    <!-- Header Section -->
     <div class="text-center mb-6 border-b border-gray-800 pb-5">
       <div class="w-16 h-16 rounded-full bg-black border-2 border-green-500 overflow-hidden logo-glow mx-auto mb-3 flex items-center justify-center">
         <img src="logo.png" alt="SKY Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
@@ -57,11 +57,11 @@
       <h1 class="font-brand text-xl sm:text-2xl font-extrabold text-white tracking-wider">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-xs sm:text-sm text-cyan-400 font-semibold tracking-wider mt-1">COMPUTER & MOTHERBOARD REPAIR HELPDESK</p>
-      <p class="text-gray-400 text-xs mt-2">කඩවත | Kadawatha - Monday Service Only (Appointment Required)</p>
+      <p class="text-xs sm:text-sm text-cyan-400 font-semibold tracking-wider mt-1">REPAIR HELPDESK & LIVE TRACKING</p>
+      <p class="text-gray-400 text-xs mt-1">කඩවත | Monday Service Only (Appointment Required)</p>
     </div>
 
-    <!-- Navigation Tabs (New Booking / Track Repair Status) -->
+    <!-- Navigation Tabs -->
     <div class="flex border-b border-gray-800 mb-6 text-sm font-bold">
       <button id="tabBook" onclick="switchTab('book')" class="flex-1 py-2 text-center text-green-400 border-b-2 border-green-500 transition cursor-pointer">
         <i class="fa-solid fa-calendar-plus mr-1"></i> New Repair Booking
@@ -75,10 +75,10 @@
     <div id="bookingSection">
       <form id="bookingForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
         
-        <!-- Customer Name -->
+        <!-- Name -->
         <div>
           <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">
-            <i class="fa-solid fa-user text-green-500 mr-1"></i> ඔබගේ නම / Name / பெயர்
+            <i class="fa-solid fa-user text-green-500 mr-1"></i> ඔබගේ නම / Name
           </label>
           <input type="text" id="customerName" required placeholder="Enter full name" class="w-full p-2.5 rounded-lg border text-sm">
         </div>
@@ -86,7 +86,7 @@
         <!-- Phone Number -->
         <div>
           <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">
-            <i class="fa-solid fa-phone text-green-500 mr-1"></i> දුරකථන අංකය / WhatsApp Phone No
+            <i class="fa-solid fa-phone text-green-500 mr-1"></i> දුරකථන අංකය / WhatsApp No
           </label>
           <input type="tel" id="phoneNumber" required placeholder="e.g. 0771234567" class="w-full p-2.5 rounded-lg border text-sm">
         </div>
@@ -109,16 +109,16 @@
 
           <div>
             <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">
-              <i class="fa-solid fa-microchip text-green-500 mr-1"></i> Model / Brand (Optional)
+              <i class="fa-solid fa-microchip text-green-500 mr-1"></i> Model / Brand
             </label>
             <input type="text" id="deviceModel" placeholder="e.g. ASUS TUF / Core i5" class="w-full p-2.5 rounded-lg border text-sm">
           </div>
         </div>
 
-        <!-- Serial Number Field -->
+        <!-- Serial Number Field (Dedicated Column C) -->
         <div>
           <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">
-            <i class="fa-solid fa-barcode text-green-500 mr-1"></i> Serial Number / IMEI / Tag (Optional)
+            <i class="fa-solid fa-barcode text-green-500 mr-1"></i> Serial Number / Tag (Optional)
           </label>
           <input type="text" id="serialNumber" placeholder="e.g. SN-9876543210" class="w-full p-2.5 rounded-lg border text-sm">
         </div>
@@ -143,7 +143,7 @@
     <div id="trackingSection" class="hidden space-y-4">
       <div>
         <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">
-          <i class="fa-solid fa-ticket text-cyan-400 mr-1"></i> Enter Ticket Number / Job No
+          <i class="fa-solid fa-ticket text-cyan-400 mr-1"></i> Enter Ticket Number
         </label>
         <div class="flex gap-2">
           <input type="text" id="searchTicketNo" placeholder="e.g. SKY-TICK-1001" class="w-full p-2.5 rounded-lg border text-sm uppercase">
@@ -154,11 +154,11 @@
       </div>
 
       <div id="trackingResult" class="hidden p-4 rounded-lg bg-slate-900 border border-cyan-500/40 text-xs space-y-2">
-        <!-- Search result will render dynamically here -->
+        <!-- Live tracking result will load here -->
       </div>
     </div>
 
-    <!-- Success / Error Message Display -->
+    <!-- Status Messages & Result Box -->
     <div id="statusMessage" class="hidden mt-4 p-4 rounded-lg text-center text-sm font-semibold"></div>
 
   </div>
@@ -168,9 +168,10 @@
   </footer>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwnOGnzOz-dNVv1TMvtcDPpLu45VdSiYHXHZ4g7pg4qTgfv29NJvpRiXWkAnPOiHqrv1w/exec';
+    // Updated Web App Script URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxWC38ihOONsWLWBMQdEe8HnSd4t56PQ42Ku3jRyTqXy592Dr2CjmxYYx3TIgLF3bGTpA/exec';
 
-    // Switch Tabs: Booking vs Live Status Tracking
+    // Switch between Booking Form and Live Tracker Tabs
     function switchTab(tab) {
       const bookSec = document.getElementById('bookingSection');
       const trackSec = document.getElementById('trackingSection');
@@ -193,7 +194,7 @@
       }
     }
 
-    // Handle Booking Form Submit
+    // Submit Booking Request
     async function handleFormSubmit(e) {
       e.preventDefault();
 
@@ -216,15 +217,14 @@
       formData.append('customerName', customerName);
       formData.append('phoneNumber', phoneNumber);
       formData.append('deviceType', deviceType);
-      formData.append('deviceModel', deviceModel ? `${deviceModel} (SN: ${serialNumber})` : `SN: ${serialNumber}`);
+      formData.append('deviceModel', deviceModel);
+      formData.append('serialNumber', serialNumber);
       formData.append('faultDescription', faultDescription);
 
       try {
         const response = await fetch(scriptURL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: formData.toString()
         });
 
@@ -269,7 +269,7 @@
           `;
           document.getElementById('bookingForm').reset();
         } else {
-          throw new Error(result.error || 'Server processing error');
+          throw new Error(result.error || 'Server error');
         }
       } catch (err) {
         console.error('Error submitting booking:', err);
@@ -291,22 +291,21 @@
         html2canvas:  { scale: 2, backgroundColor: '#0f172a' },
         jsPDF:        { unit: 'in', format: 'a5', orientation: 'portrait' }
       };
-
       html2pdf().set(opt).from(element).save();
     }
 
-    // Live Track Repair Status from Google Sheet
+    // Live Track Ticket Status from Google Sheet
     async function trackStatus() {
       const searchTicket = document.getElementById('searchTicketNo').value.trim().toUpperCase();
       const trackingResult = document.getElementById('trackingResult');
 
       if (!searchTicket) {
-        alert('කරුණාකර Ticket / Job Number එකක් ඇතුළත් කරන්න (e.g. SKY-TICK-1001)');
+        alert('කරුණාකර Ticket Number එකක් ඇතුළත් කරන්න (e.g. SKY-TICK-1001)');
         return;
       }
 
       trackingResult.classList.remove('hidden');
-      trackingResult.innerHTML = `<p class="text-center text-cyan-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Searching Google Sheet...</p>`;
+      trackingResult.innerHTML = `<p class="text-center text-cyan-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Fetching Live Status...</p>`;
 
       try {
         const response = await fetch(scriptURL);
@@ -329,6 +328,7 @@
             <div class="space-y-1 text-gray-200">
               <p><strong class="text-gray-400">Customer Name:</strong> ${ticket.customerName}</p>
               <p><strong class="text-gray-400">Device & Model:</strong> ${ticket.deviceType} ${ticket.deviceModel ? '(' + ticket.deviceModel + ')' : ''}</p>
+              <p><strong class="text-gray-400">Serial No:</strong> ${ticket.serialNumber || 'N/A'}</p>
               <p><strong class="text-gray-400">Fault / Note:</strong> ${ticket.faultDescription}</p>
             </div>
             <div class="mt-3 text-[10px] text-cyan-400 text-center border-t border-gray-800 pt-2">
