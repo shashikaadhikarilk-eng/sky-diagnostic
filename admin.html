@@ -142,7 +142,7 @@
 
   <script>
     // නව Google Apps Script Web App URL එක
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzfbAebOhFzKR0hE5C7Kg82HHYnMk1vg-eypcwRORIasfO9hC9QDLsM9oK2500WOcw_/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3royrLMaxMR4jMnqBaPrA0zr6nuYXvalEml2Scf6mktAx5t4eYh4Bz27oxGY6EC2muw/exec';
     const SECRET_PASS = "sky123";
     let currentTargetPhone = "";
 
@@ -174,22 +174,9 @@
       location.reload();
     }
 
-    // 1000 සිට නිවැරදි පිළිවෙලට Ticket Number එක සාදන Function එක (1004, 1005 ...)
+    // Ticket Number එක 1000 සිට අනුපිළිවෙලින් (SKY-TICK-1001, SKY-TICK-1002...) සැකසීම
     function formatTicketNumber(val, rowIndex) {
       const calculatedNumber = 1000 + (rowIndex - 1);
-      
-      if (!val) return `SKY-TICK-${calculatedNumber}`;
-      let s = val.toString().trim();
-      
-      if (s.length > 15 || s.includes('Oct') || s.includes('Sep') || s.includes('2026') || s.includes('Mon') || s.includes('GMT') || s.includes('India')) {
-        return `SKY-TICK-${calculatedNumber}`;
-      }
-      if (s.startsWith('SKY-TICK-')) {
-        return s;
-      }
-      if (s.startsWith('SKY-')) {
-        return s.replace('SKY-', 'SKY-TICK-');
-      }
       return `SKY-TICK-${calculatedNumber}`;
     }
 
@@ -200,13 +187,17 @@
       fetch(scriptURL)
         .then(res => res.json())
         .then(tickets => {
+          if (tickets.error) {
+            alert("Apps Script Error: " + tickets.error);
+            return;
+          }
           renderBoard(tickets);
           document.getElementById('loading').classList.add('hidden');
           document.getElementById('board').classList.remove('hidden');
         })
         .catch(err => {
           console.error(err);
-          alert("Error fetching tickets!");
+          alert("Error fetching tickets from Google Sheets!");
         });
     }
 
@@ -224,8 +215,15 @@
       if(!Array.isArray(tickets)) return;
 
       tickets.reverse().forEach(t => {
-        const currentStatus = t.status || 'New Ticket';
-        if (!cols[currentStatus]) return;
+        let currentStatus = t.status ? t.status.trim() : 'New Ticket';
+        
+        if (!cols[currentStatus]) {
+          if(currentStatus.toLowerCase().includes('process')) currentStatus = 'In Process';
+          else if(currentStatus.toLowerCase().includes('part')) currentStatus = 'Parts Pending';
+          else if(currentStatus.toLowerCase().includes('ready')) currentStatus = 'Ready For Pickup';
+          else if(currentStatus.toLowerCase().includes('complete')) currentStatus = 'Completed';
+          else currentStatus = 'New Ticket';
+        }
 
         cols[currentStatus].count++;
 
@@ -236,14 +234,14 @@
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="font-brand text-green-400 font-bold">${displayTicket}</span>
-            <span class="bg-black border border-green-900/50 text-cyan-300 text-[10px] px-2 py-0.5 rounded">${t.deviceType}</span>
+            <span class="bg-black border border-green-900/50 text-cyan-300 text-[10px] px-2 py-0.5 rounded">${t.deviceType || 'Device'}</span>
           </div>
-          <div class="text-sm font-bold text-white">${t.customerName}</div>
-          <div class="text-cyan-300 font-mono">📞 ${t.phoneNumber}</div>
-          <div class="text-gray-300"><span class="text-gray-400">Model:</span> ${t.deviceModel}</div>
-          <div class="text-gray-400 font-mono text-[11px]"><span class="text-gray-500">S/N:</span> ${t.serialNumber}</div>
+          <div class="text-sm font-bold text-white">${t.customerName || 'Customer'}</div>
+          <div class="text-cyan-300 font-mono">📞 ${t.phoneNumber || '-'}</div>
+          <div class="text-gray-300"><span class="text-gray-400">Model:</span> ${t.deviceModel || '-'}</div>
+          <div class="text-gray-400 font-mono text-[11px]"><span class="text-gray-500">S/N:</span> ${t.serialNumber || '-'}</div>
           <div class="p-2 bg-black/50 border border-red-900/30 rounded-lg text-amber-300/90 text-[11px]">
-            <span class="font-bold text-red-400">Fault:</span> ${t.faultDescription}
+            <span class="font-bold text-red-400">Fault:</span> ${t.faultDescription || '-'}
           </div>
           <div class="pt-2 border-t border-green-900/30 space-y-2">
             <div>
@@ -283,49 +281,15 @@
     }
 
     function openWaModal(phone, name, ticket, status, model) {
-      let cleanPhone = phone.replace(/[^0-9]/g, '');
+      let cleanPhone = (phone || '').replace(/[^0-9]/g, '');
       if (cleanPhone.startsWith('0')) cleanPhone = '94' + cleanPhone.substring(1);
       currentTargetPhone = cleanPhone;
-      document.getElementById('modalCustomerName').innerText = name;
-      document.getElementById('modalPhoneNumber').innerText = phone;
+      document.getElementById('modalCustomerName').innerText = name || '';
+      document.getElementById('modalPhoneNumber').innerText = phone || '';
 
-      let statusMsg = "";
-
-      if (status === "In Process") {
-        statusMsg = `🛠️ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
-                    `_Sri Lanka Standard Time (SLST)_\n\n` +
-                    `Hello ${name},\nYour device (${model}) under Ticket *${ticket}* is now *IN PROCESS*.\n\n` +
-                    `ඔබගේ උපකරණයේ (${model}) අලුත්වැඩියා කටයුතු ආරම්භ කරන ලදී. (ටිකට් අංකය: ${ticket})\n\n` +
-                    `உங்கள் சாதனம் (${model}) பரிசோதிக்கப்பட்டு வருகிறது. (டிக்கெட்: ${ticket})`;
-      } 
-      else if (status === "Parts Pending") {
-        statusMsg = `⏳ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
-                    `_Sri Lanka Standard Time (SLST)_\n\n` +
-                    `Hello ${name},\nYour device (${model}) under Ticket *${ticket}* status: *PARTS PENDING*.\n\n` +
-                    `ඔබගේ උපකරණය (${model}) සඳහා අමතර කොටස් ලබාගැනීමට ඇති බැවින් තරමක් ප්‍රමාද වේ. (ටිකට් අංකය: ${ticket})\n\n` +
-                    `உங்கள் சாதனத்திற்கு (${model}) உதிரி பாகங்கள் தேவைப்படுகின்றன. (டிக்கெட்: ${ticket})`;
-      } 
-      else if (status === "Ready For Pickup") {
-        statusMsg = `✅ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
-                    `_Sri Lanka Standard Time (SLST)_\n\n` +
-                    `Hello ${name},\nGreat news! Your device (${model}) under Ticket *${ticket}* is *READY FOR PICKUP*!\n\n` +
-                    `ඔබගේ උපකරණය (${model}) සාදා නිමකර ඇති අතර, පැමිණ ලබාගත හැක. (ටිකට් අංකය: ${ticket})\n\n` +
-                    `உங்கள் சாதனம் (${model}) தயாராக உள்ளது. வந்து பெற்றுக்கொள்ளலாம். (டிக்கெட்: ${ticket})`;
-      } 
-      else if (status === "Completed") {
-        statusMsg = `🏁 *SKY TECHNOLOGIES*\n` +
-                    `_Sri Lanka Standard Time (SLST)_\n\n` +
-                    `Hello ${name},\nTicket *${ticket}* (${model}) is marked as Completed. Thank you!\n\n` +
-                    `SKY TECHNOLOGIES වෙතින් සේවාව ලබාගැනීම ගැන ස්තූතියි! (ටිකට් අංකය: ${ticket})\n\n` +
-                    `SKY TECHNOLOGIES தேர்வு செய்ததற்கு நன்றி! (டிக்கெட்: ${ticket})`;
-      } 
-      else {
-        statusMsg = `ℹ️ *SKY TECHNOLOGIES*\n` +
-                    `_Sri Lanka Standard Time (SLST)_\n\n` +
-                    `Hello ${name},\nYour Ticket *${ticket}* Status: *${status}*.\n\n` +
-                    `ඔබගේ ටිකට්පත් තත්ත්වය: ${status}\n\n` +
-                    `உங்கள் டிக்கெட் நிலை: ${status}`;
-      }
+      let statusMsg = `🛠️ *SKY TECHNOLOGIES STATUS UPDATE*\n\n` +
+                      `Hello ${name},\nYour Ticket *${ticket}* (${model}) status is: *${status}*.\n\n` +
+                      `ඔබගේ ටිකට්පත් තත්ත්වය: ${status}`;
 
       document.getElementById('modalMsgText').value = statusMsg;
       document.getElementById('whatsappModal').classList.remove('hidden');
