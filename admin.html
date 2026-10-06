@@ -6,71 +6,101 @@
   <title>SKY TECHNOLOGIES - Admin Kanban Dashboard</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     body {
-      font-family: 'Rajdhani', 'Noto Sans Sinhala', sans-serif;
-      background: #090d12;
+      font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0%, #090d12 100%);
       color: #e2e8f0;
       min-height: 100vh;
     }
     .font-brand { font-family: 'Orbitron', sans-serif; }
     
     .glass-card {
-      background: #111822;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      background: rgba(17, 24, 34, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
     }
     
     .logo-glow {
-      box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
     }
 
     select, textarea, input {
-      background: #090d12 !important;
-      border-color: rgba(255, 255, 255, 0.15) !important;
+      background: rgba(9, 13, 18, 0.9) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
       color: #ffffff !important;
     }
 
     select:focus, textarea:focus, input:focus {
       border-color: #22c55e !important;
       outline: none !important;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.3) !important;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4) !important;
     }
   </style>
 </head>
-<body class="p-4 sm:p-6">
+<body class="p-4 sm:p-6 flex flex-col items-center justify-center min-h-screen">
 
-  <!-- Header -->
-  <div class="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-center glass-card p-4 rounded-2xl">
-    <div class="flex items-center gap-3 mb-3 sm:mb-0">
-      <div class="w-12 h-12 rounded-full bg-black border-2 border-green-500 overflow-hidden logo-glow flex items-center justify-center">
-        <span class="font-brand text-green-400 font-bold text-sm">SKY</span>
-      </div>
+  <!-- LOGIN SECTION -->
+  <div id="loginScreen" class="w-full max-w-md glass-card rounded-2xl p-6 sm:p-8 text-center space-y-6">
+    <div class="w-16 h-16 rounded-full bg-black border-2 border-green-500 overflow-hidden logo-glow mx-auto flex items-center justify-center">
+      <span class="font-brand text-green-400 font-bold text-sm">SKY</span>
+    </div>
+    <div>
+      <h1 class="font-brand text-xl font-extrabold text-white tracking-wider">ADMIN PORTAL</h1>
+      <p class="text-xs text-cyan-400 font-semibold mt-1">SKY TECHNOLOGIES KADAWATHA</p>
+    </div>
+    <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
       <div>
-        <h1 class="font-brand text-lg sm:text-xl font-extrabold text-white tracking-wider">
-          SKY <span class="text-green-500">TECHNOLOGIES</span>
-        </h1>
-        <p class="text-xs text-cyan-400 font-semibold">ADMIN HELPDESK KANBAN BOARD</p>
+        <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Admin Password:</label>
+        <input type="password" id="adminPassword" required placeholder="Enter password" class="w-full p-3 rounded-xl border text-sm">
       </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <button onclick="loadDashboard()" class="bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2 rounded-lg text-xs transition cursor-pointer flex items-center gap-2">
-        <i class="fa-solid fa-rotate"></i> REFRESH BOARD
+      <button type="submit" class="w-full font-brand bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl shadow-lg transition cursor-pointer text-sm">
+        LOGIN TO DASHBOARD
       </button>
-    </div>
+      <p id="loginError" class="text-red-400 text-xs text-center hidden font-semibold">Incorrect Password! Try again.</p>
+    </form>
   </div>
 
-  <!-- Kanban Board Grid -->
-  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="kanbanBoard">
-    <!-- Columns will load dynamically -->
+  <!-- DASHBOARD SECTION (Hidden Initially) -->
+  <div id="dashboardScreen" class="w-full max-w-[95%] hidden space-y-6">
+    
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-center glass-card p-4 sm:p-6 rounded-2xl">
+      <div class="flex items-center gap-3 mb-3 sm:mb-0">
+        <div class="w-12 h-12 rounded-full bg-black border-2 border-green-500 overflow-hidden logo-glow flex items-center justify-center">
+          <span class="font-brand text-green-400 font-bold text-sm">SKY</span>
+        </div>
+        <div>
+          <h1 class="font-brand text-lg sm:text-xl font-extrabold text-white tracking-wider">
+            SKY <span class="text-green-500">TECHNOLOGIES</span>
+          </h1>
+          <p class="text-xs text-cyan-400 font-semibold">ADMIN HELPDESK KANBAN BOARD</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="loadDashboard()" class="bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-2 shadow">
+          <i class="fa-solid fa-rotate"></i> REFRESH BOARD
+        </button>
+        <button onclick="logoutAdmin()" class="bg-red-600/80 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-2 shadow">
+          <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
+        </button>
+      </div>
+    </div>
+
+    <!-- Kanban Board Grid (5 Columns) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4" id="kanbanBoard">
+      <!-- Columns load dynamically -->
+    </div>
   </div>
 
   <!-- WhatsApp Edit Modal -->
-  <div id="waModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="glass-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-green-500/40">
+  <div id="waModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-card w-full max-w-lg rounded-2xl p-6 space-y-4 border border-green-500/40 shadow-2xl">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <h3 class="font-brand text-green-400 font-bold text-sm flex items-center gap-2">
           <i class="fa-brands fa-whatsapp text-lg"></i> Edit & Send WhatsApp Message
@@ -80,53 +110,81 @@
         </button>
       </div>
       
-      <div>
-        <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Customer Phone Number:</label>
-        <input type="text" id="waPhone" class="w-full p-2.5 rounded-lg border text-sm" readonly>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Customer Phone:</label>
+          <input type="text" id="waPhone" class="w-full p-2.5 rounded-xl border text-sm" readonly>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Select Language:</label>
+          <select id="waLang" onchange="updateWaMessageTemplate()" class="w-full p-2.5 rounded-xl border text-sm">
+            <option value="si">සිංහල (Sinhala)</option>
+            <option value="en">English</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+          </select>
+        </div>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Message Body (You can edit below):</label>
-        <textarea id="waMessageText" rows="6" class="w-full p-2.5 rounded-lg border text-sm"></textarea>
+        <label class="block text-xs font-bold text-gray-300 uppercase mb-1">Message Body (Editable):</label>
+        <textarea id="waMessageText" rows="6" class="w-full p-2.5 rounded-xl border text-sm"></textarea>
       </div>
 
       <div class="flex gap-3 pt-2">
-        <button onclick="closeWaModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2.5 rounded-lg text-xs transition cursor-pointer">
+        <button onclick="closeWaModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-xl text-xs transition cursor-pointer">
           CANCEL
         </button>
-        <button onclick="sendFinalWhatsApp()" class="flex-1 bg-green-600 hover:bg-green-500 text-black font-bold py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-2">
-          <i class="fa-brands fa-whatsapp"></i> SEND TO WHATSAPP
+        <button onclick="sendFinalWhatsApp()" class="flex-1 bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow">
+          <i class="fa-brands fa-whatsapp text-base"></i> SEND TO WHATSAPP
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    // Updated Web App Script URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxWC38ihOONsWLWBMQdEe8HnSd4t56PQ42Ku3jRyTqXy592Dr2CjmxYYx3TIgLF3bGTpA/exec';
+    const ADMIN_PASS = 'Sky1234'; // ඉල්ලූ පරිදි Password එක Sky1234 ලෙස සකසා ඇත
 
     const columns = [
       { title: 'New Ticket', status: 'New Ticket', color: 'border-blue-500 text-blue-400' },
       { title: 'In Progress', status: 'In Progress', color: 'border-yellow-500 text-yellow-400' },
+      { title: 'Parts Pending', status: 'Parts Pending', color: 'border-orange-500 text-orange-400' },
       { title: 'Ready For PickUp', status: 'Ready For PickUp', color: 'border-emerald-500 text-emerald-400' },
       { title: 'Completed', status: 'Completed', color: 'border-green-500 text-green-400' }
     ];
 
     let allTickets = [];
-    let currentWaPhone = '';
+    let activeTicketData = null;
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminPassword').value;
+      if (pass === ADMIN_PASS) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+        loadDashboard();
+      } else {
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    }
+
+    function logoutAdmin() {
+      document.getElementById('dashboardScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('adminPassword').value = '';
+    }
 
     async function loadDashboard() {
       const board = document.getElementById('kanbanBoard');
-      board.innerHTML = `<div class="col-span-full text-center py-10 text-cyan-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading Tickets from Sheet...</div>`;
+      board.innerHTML = `<div class="col-span-full text-center py-16 text-cyan-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-2 text-xl"></i> Loading Dashboard...</div>`;
 
       try {
         const response = await fetch(scriptURL + '?t=' + new Date().getTime());
         allTickets = await response.json();
-
         renderKanban();
       } catch (err) {
         console.error('Error loading dashboard:', err);
-        board.innerHTML = `<div class="col-span-full text-center py-10 text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Failed to load data from Sheet.</div>`;
+        board.innerHTML = `<div class="col-span-full text-center py-16 text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Failed to load data from Sheet.</div>`;
       }
     }
 
@@ -147,17 +205,17 @@
           <div class="glass-card rounded-2xl p-4 flex flex-col h-[75vh]">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3">
               <h2 class="font-brand text-xs font-bold uppercase tracking-wider ${col.color}">${col.title}</h2>
-              <span class="bg-gray-800 text-gray-300 px-2 py-0.5 rounded-full text-xs font-bold">${colTickets.length}</span>
+              <span class="bg-gray-800 text-gray-300 px-2.5 py-0.5 rounded-full text-xs font-bold">${colTickets.length}</span>
             </div>
             <div class="overflow-y-auto flex-1 space-y-3 pr-1">
         `;
 
         if (colTickets.length === 0) {
-          colHtml += `<p class="text-center text-gray-500 text-xs py-8">No tickets here</p>`;
+          colHtml += `<p class="text-center text-gray-500 text-xs py-10">No tickets here</p>`;
         } else {
           colTickets.forEach(ticket => {
             colHtml += `
-              <div class="bg-slate-900 border border-gray-800 rounded-xl p-3 text-xs space-y-2 relative">
+              <div class="bg-slate-900/80 border border-gray-800/80 rounded-xl p-3 text-xs space-y-2 shadow-md">
                 <div class="flex justify-between items-start">
                   <span class="font-brand text-green-400 font-bold">${ticket.ticketNumber}</span>
                   <span class="text-[10px] text-gray-400">${new Date(ticket.date).toLocaleDateString()}</span>
@@ -166,17 +224,18 @@
                   <p class="font-bold text-white text-sm">${ticket.customerName} - <span class="text-cyan-400">${ticket.phoneNumber}</span></p>
                   <p class="text-gray-300 mt-0.5"><i class="fa-solid fa-laptop text-green-500 mr-1"></i> ${ticket.deviceType} ${ticket.deviceModel ? '(' + ticket.deviceModel + ')' : ''}</p>
                   <p class="text-gray-400"><i class="fa-solid fa-barcode text-yellow-500 mr-1"></i> Serial: ${ticket.serialNumber || 'N/A'}</p>
-                  <p class="text-gray-300 italic mt-1 bg-black/40 p-1.5 rounded border border-gray-800">"${ticket.faultDescription}"</p>
+                  <p class="text-gray-300 italic mt-1 bg-black/40 p-2 rounded border border-gray-800">"${ticket.faultDescription}"</p>
                 </div>
                 
                 <div class="pt-2 border-t border-gray-800 flex items-center justify-between gap-2">
-                  <select onchange="updateStatus(${ticket.rowIndex}, this.value)" class="text-[11px] p-1.5 rounded border w-full">
+                  <select onchange="updateStatus(${ticket.rowIndex}, this.value)" class="text-[11px] p-2 rounded-lg border w-full">
                     <option value="New Ticket" ${ticket.status === 'New Ticket' ? 'selected' : ''}>New Ticket</option>
                     <option value="In Progress" ${ticket.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Parts Pending" ${ticket.status === 'Parts Pending' ? 'selected' : ''}>Parts Pending</option>
                     <option value="Ready For PickUp" ${ticket.status === 'Ready For PickUp' ? 'selected' : ''}>Ready For PickUp</option>
                     <option value="Completed" ${ticket.status === 'Completed' ? 'selected' : ''}>Completed</option>
                   </select>
-                  <button onclick="openWaModal('${ticket.phoneNumber}', '${ticket.ticketNumber}', '${ticket.customerName}', '${ticket.status}')" class="bg-green-600/20 hover:bg-green-600 text-green-400 hover:text-black border border-green-500/50 p-2 rounded transition cursor-pointer" title="Edit & Send WhatsApp">
+                  <button onclick='openWaModal(${JSON.stringify(ticket)})' class="bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/50 p-2.5 rounded-lg transition cursor-pointer" title="Edit & Send WhatsApp">
                     <i class="fa-brands fa-whatsapp text-sm"></i>
                   </button>
                 </div>
@@ -215,16 +274,33 @@
       }
     }
 
-    // Open WhatsApp Edit Modal
-    function openWaModal(phone, ticketNo, name, status) {
-      currentWaPhone = phone.replace(/^0/, '94'); // Sri Lankan format check
+    function openWaModal(ticket) {
+      activeTicketData = ticket;
+      document.getElementById('waPhone').value = ticket.phoneNumber;
+      document.getElementById('waLang').value = 'si';
+      updateWaMessageTemplate();
       
-      let defaultMsg = `Hello ${name}, Greetings from Sky Technologies! \n\nYour repair ticket *${ticketNo}* status has been updated to: *${status || 'New Ticket'}*.\n\nThank you for choosing Sky Technologies Kadawatha.`;
-
-      document.getElementById('waPhone').value = phone;
-      document.getElementById('waMessageText').value = defaultMsg;
       document.getElementById('waModal').classList.remove('hidden');
       document.getElementById('waModal').classList.add('flex');
+    }
+
+    function updateWaMessageTemplate() {
+      if (!activeTicketData) return;
+      const lang = document.getElementById('waLang').value;
+      const name = activeTicketData.customerName;
+      const ticketNo = activeTicketData.ticketNumber;
+      const status = activeTicketData.status || 'New Ticket';
+
+      let msg = '';
+      if (lang === 'si') {
+        msg = `ආයුබෝවන් ${name}, Sky Technologies වෙතින් පිළිගනිමු!\n\nඔබගේ අලුත්වැඩියා අංකය *${ticketNo}* හි වත්මන් තත්ත්වය: *${status}* ලෙස යාවත්කාලීන කර ඇත.\n\nකඩවත Sky Technologies වෙත පැමිණීම ගැන ස්තූතියි!`;
+      } else if (lang === 'ta') {
+        msg = `வணக்கம் ${name}, Sky Technologies-க்கு உங்களை வரவேற்கிறோம்!\n\nஉங்கள் பழுதுபார்ப்பு சீட்டு *${ticketNo}* இன் நிலை: *${status}* என புதுப்பிக்கப்பட்டுள்ளது.\n\nநன்றி!`;
+      } else {
+        msg = `Hello ${name}, Greetings from Sky Technologies!\n\nYour repair ticket *${ticketNo}* status has been updated to: *${status}*.\n\nThank you for choosing Sky Technologies Kadawatha.`;
+      }
+
+      document.getElementById('waMessageText').value = msg;
     }
 
     function closeWaModal() {
@@ -233,15 +309,14 @@
     }
 
     function sendFinalWhatsApp() {
+      if (!activeTicketData) return;
+      let cleanPhone = activeTicketData.phoneNumber.replace(/^0/, '94');
       const msg = document.getElementById('waMessageText').value;
       const encodedMsg = encodeURIComponent(msg);
-      const waUrl = `https://wa.me/${currentWaPhone}?text=${encodedMsg}`;
+      const waUrl = `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
       window.open(waUrl, '_blank');
       closeWaModal();
     }
-
-    // Initial load
-    loadDashboard();
   </script>
 </body>
 </html>
