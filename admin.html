@@ -49,7 +49,6 @@
   <!-- Header Section -->
   <header class="bg-[#111822] border border-gray-800 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0">
     <div class="flex items-center gap-3">
-      <!-- SKY LOGO -->
       <div class="w-10 h-10 rounded-full bg-black border border-green-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
         <img src="logo.png" alt="SKY Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
         <span class="hidden font-brand text-green-400 font-bold text-xs">SKY</span>
@@ -76,12 +75,13 @@
   </main>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwRSSSQZCjOTuZwHltkFUOw1qA7Ib74zDBKr_RmcVPbusBxu0Hekf6cC6NT9E1-Xz-DOg/exec';
+    // Updated Google Apps Script Web App URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx2_Sz-XYIJNZcNpsyao52k1IMzCcRALuMiOUQdEfmQ6UpQCDTuHPilIGDw3E6gHMTjTw/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
       { id: "In Process", title: "In Process", color: "border-yellow-500" },
-      { id: "On Hold", title: "On Hold (Pending Confirm)", color: "border-purple-500" },
+      { id: "On Hold", title: "On Hold", color: "border-purple-500" },
       { id: "Parts Pending", title: "Parts Pending", color: "border-orange-500" },
       { id: "Ready For Collect", title: "Ready For Collect", color: "border-emerald-500" },
       { id: "Delivered", title: "Delivered", color: "border-gray-600" }
@@ -97,31 +97,30 @@
       return `SKY-TICK-${1000 + (rowIndex - 1)}`;
     }
 
-    // Status එක Google Sheet එකේ Update කිරීම සහ Board එකේ අදාළ Column එකට Card එක Move කිරීම
     function updateTicketStatus(rowIndex, newStatus) {
-      // Local Array එකේ Status එක මාරු කිරීම
-      const item = globalTickets.find(t => t.rowIndex === rowIndex);
-      if (item) {
-        item.status = newStatus;
+      const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
+      if (ticket) {
+        ticket.status = newStatus;
       }
 
-      // Board එක නැවත Render කිරීම (එවිට අදාළ column එකට වැටේ)
+      // Local UI instant update
       renderBoard(globalTickets);
 
-      // Google Sheet එක Update කිරීමට Backend එකට Request යැවීම
+      // Backend Google Sheet target row update
       fetch(scriptURL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-parse' },
-        body: JSON.stringify({ action: 'updateStatus', rowIndex: rowIndex, status: newStatus })
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ 
+          action: 'updateStatus', 
+          rowIndex: rowIndex, 
+          status: newStatus 
+        })
       })
-      .then(() => {
-        console.log("Status Updated Successfully in Google Sheet");
-      })
+      .then(res => res.json())
+      .then(data => console.log("Status updated successfully:", data))
       .catch(err => console.error("Error updating status:", err));
     }
 
-    // Trilingual WhatsApp Message Sender
     function sendWhatsAppUpdate(phone, name, ticketId, device, statusSelectId) {
       const selectedStatus = document.getElementById(statusSelectId).value;
       let message = "";
@@ -199,7 +198,6 @@
         
         boardHtml += `
           <div class="w-72 sm:w-80 flex-shrink-0 bg-[#0d131d] border border-gray-800 rounded-xl flex flex-col h-full max-h-full">
-            <!-- Column Header -->
             <div class="p-3 border-b border-gray-800 flex justify-between items-center bg-[#111822] rounded-t-xl">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full ${col.color.replace('border-', 'bg-')}"></span>
@@ -208,19 +206,18 @@
               <span class="text-xs bg-gray-800 text-green-400 px-2 py-0.5 rounded-full font-bold font-mono border border-gray-700">${tickets.length}</span>
             </div>
 
-            <!-- Scroll Area -->
             <div class="p-2 flex-1 overflow-y-auto space-y-2.5 kanban-col-scroll">
         `;
 
         if (tickets.length === 0) {
           boardHtml += `<div class="text-center py-8 text-gray-600 text-xs italic">No tickets in this column</div>`;
         } else {
-          tickets.reverse().forEach((tk, idx) => {
+          tickets.slice().reverse().forEach((tk) => {
             const ticketId = formatTicketNumber(tk.ticketNumber, tk.rowIndex);
             const customer = tk.customerName || "Unknown Customer";
             const phone = tk.phoneNumber || "";
             const device = `${tk.deviceType || 'Device'} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`;
-            const selectId = `status-select-${col.id.replace(/\s+/g, '')}-${idx}`;
+            const selectId = `status-select-${tk.rowIndex}`;
 
             boardHtml += `
               <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs">
@@ -233,7 +230,6 @@
                   <div class="text-gray-400 text-[11px] truncate mt-0.5"><i class="fa-solid fa-wrench text-gray-500 mr-1"></i> ${tk.faultDescription || '-'}</div>
                 </div>
 
-                <!-- Process Selector with onChange event -->
                 <div class="pt-2 border-t border-gray-800/60 space-y-2">
                   <div>
                     <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Process State:</label>
