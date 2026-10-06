@@ -173,22 +173,23 @@
       location.reload();
     }
 
-    // Google Sheet එකේ ඇති පිළිවෙල අනුව (Index 0 නම් 1005, Index 1 නම් 1006)
-    function formatTicketNumber(val, arrayIndex) {
-      let idx = parseInt(arrayIndex) || 0;
-      let calculatedNum = `SKY-TICK-${1005 + idx}`;
-
-      if (!val) return calculatedNum;
+    // 1000 සිට නිවැරදි පිළිවෙලට Ticket Number එක සාදන Function එක (1004, 1005 ...)
+    function formatTicketNumber(val, rowIndex) {
+      const calculatedNumber = 1000 + (rowIndex - 1);
       
+      if (!val) return `SKY-TICK-${calculatedNumber}`;
       let s = val.toString().trim();
-
-      // 이미 SKY-TICK-1005 වැනි නිවැරදි Format එකක් ඇත්නම් එයම පෙන්වන්න
-      if (/^SKY-TICK-\d{4,}$/i.test(s)) {
-        return s.toUpperCase();
+      
+      if (s.length > 15 || s.includes('Oct') || s.includes('Sep') || s.includes('2026') || s.includes('Mon') || s.includes('GMT') || s.includes('India')) {
+        return `SKY-TICK-${calculatedNumber}`;
       }
-
-      // හිස් හෝ නොගැලපෙන අගයක් ආවොත් සූත්‍රගත අංකය ලබා දෙන්න
-      return calculatedNum;
+      if (s.startsWith('SKY-TICK-')) {
+        return s;
+      }
+      if (s.startsWith('SKY-')) {
+        return s.replace('SKY-', 'SKY-TICK-');
+      }
+      return `SKY-TICK-${calculatedNumber}`;
     }
 
     function fetchTickets() {
@@ -221,38 +222,32 @@
 
       if(!Array.isArray(tickets)) return;
 
-      // index අගය (0, 1, 2...) ලබාගෙන Ticket Number එක හරියටම පවරයි
-      tickets.forEach((t, index) => {
+      tickets.reverse().forEach(t => {
         const currentStatus = t.status || 'New Ticket';
         if (!cols[currentStatus]) return;
 
         cols[currentStatus].count++;
 
-        // index 0 -> SKY-TICK-1005
-        // index 1 -> SKY-TICK-1006
-        const displayTicket = formatTicketNumber(t.ticketNumber, index);
-
-        // Google Sheet එකේ Update කිරීමට අවශ්‍ය Actual Row Index එක (Header Row එක නිසා index + 2)
-        const sheetRowIndex = t.rowIndex || (index + 2);
+        const displayTicket = formatTicketNumber(t.ticketNumber, t.rowIndex);
 
         const card = document.createElement('div');
         card.className = 'ticket-card rounded-xl p-3.5 space-y-2 text-xs relative';
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="font-brand text-green-400 font-bold">${displayTicket}</span>
-            <span class="bg-black border border-green-900/50 text-cyan-300 text-[10px] px-2 py-0.5 rounded">${t.deviceType || 'Device'}</span>
+            <span class="bg-black border border-green-900/50 text-cyan-300 text-[10px] px-2 py-0.5 rounded">${t.deviceType}</span>
           </div>
-          <div class="text-sm font-bold text-white">${t.customerName || 'N/A'}</div>
-          <div class="text-cyan-300 font-mono">📞 ${t.phoneNumber || 'N/A'}</div>
-          <div class="text-gray-300"><span class="text-gray-400">Model:</span> ${t.deviceModel || 'N/A'}</div>
-          <div class="text-gray-400 font-mono text-[11px]"><span class="text-gray-500">S/N:</span> ${t.serialNumber || 'N/A'}</div>
+          <div class="text-sm font-bold text-white">${t.customerName}</div>
+          <div class="text-cyan-300 font-mono">📞 ${t.phoneNumber}</div>
+          <div class="text-gray-300"><span class="text-gray-400">Model:</span> ${t.deviceModel}</div>
+          <div class="text-gray-400 font-mono text-[11px]"><span class="text-gray-500">S/N:</span> ${t.serialNumber}</div>
           <div class="p-2 bg-black/50 border border-red-900/30 rounded-lg text-amber-300/90 text-[11px]">
-            <span class="font-bold text-red-400">Fault:</span> ${t.faultDescription || 'N/A'}
+            <span class="font-bold text-red-400">Fault:</span> ${t.faultDescription}
           </div>
           <div class="pt-2 border-t border-green-900/30 space-y-2">
             <div>
               <label class="block text-[10px] text-gray-400 mb-1 font-semibold">CHANGE STATUS:</label>
-              <select onchange="updateStatus(${sheetRowIndex}, this.value)" class="w-full bg-black text-cyan-300 border border-green-900/60 rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer">
+              <select onchange="updateStatus(${t.rowIndex}, this.value)" class="w-full bg-black text-cyan-300 border border-green-900/60 rounded-lg px-2.5 py-1.5 text-xs outline-none cursor-pointer">
                 <option value="New Ticket" ${currentStatus === 'New Ticket' ? 'selected' : ''}>🆕 New Ticket</option>
                 <option value="In Process" ${currentStatus === 'In Process' ? 'selected' : ''}>⚙️ In Process</option>
                 <option value="Parts Pending" ${currentStatus === 'Parts Pending' ? 'selected' : ''}>⏳ Parts Pending</option>
@@ -260,7 +255,7 @@
                 <option value="Completed" ${currentStatus === 'Completed' ? 'selected' : ''}>🏁 Completed</option>
               </select>
             </div>
-            <button onclick="openWaModal('${t.phoneNumber || ''}', '${t.customerName || ''}', '${displayTicket}', '${currentStatus}', '${t.deviceModel || ''}')" 
+            <button onclick="openWaModal('${t.phoneNumber}', '${t.customerName}', '${displayTicket}', '${currentStatus}', '${t.deviceModel}')" 
                     class="w-full font-bold bg-green-500/20 border border-green-500/50 hover:bg-green-500 hover:text-black text-green-300 py-2 rounded-lg transition text-[11px] flex items-center justify-center gap-1.5 cursor-pointer">
               💬 QUICK WHATSAPP CHAT
             </button>
@@ -296,31 +291,36 @@
       let statusMsg = "";
 
       if (status === "In Process") {
-        statusMsg = `🛠️ *SKY TECHNOLOGIES STATUS UPDATE*\n\n` +
+        statusMsg = `🛠️ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
                     `Hello ${name},\nYour device (${model}) under Ticket *${ticket}* is now *IN PROCESS*.\n\n` +
                     `ඔබගේ උපකරණයේ (${model}) අලුත්වැඩියා කටයුතු ආරම්භ කරන ලදී. (ටිකට් අංකය: ${ticket})\n\n` +
                     `உங்கள் சாதனம் (${model}) பரிசோதிக்கப்பட்டு வருகிறது. (டிக்கெட்: ${ticket})`;
       } 
       else if (status === "Parts Pending") {
-        statusMsg = `⏳ *SKY TECHNOLOGIES STATUS UPDATE*\n\n` +
+        statusMsg = `⏳ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
                     `Hello ${name},\nYour device (${model}) under Ticket *${ticket}* status: *PARTS PENDING*.\n\n` +
                     `ඔබගේ උපකරණය (${model}) සඳහා අමතර කොටස් ලබාගැනීමට ඇති බැවින් තරමක් ප්‍රමාද වේ. (ටිකට් අංකය: ${ticket})\n\n` +
                     `உங்கள் சாதனத்திற்கு (${model}) உதிரி பாகங்கள் தேவைப்படுகின்றன. (டிக்கெட்: ${ticket})`;
       } 
       else if (status === "Ready For Pickup") {
-        statusMsg = `✅ *SKY TECHNOLOGIES STATUS UPDATE*\n\n` +
+        statusMsg = `✅ *SKY TECHNOLOGIES STATUS UPDATE*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
                     `Hello ${name},\nGreat news! Your device (${model}) under Ticket *${ticket}* is *READY FOR PICKUP*!\n\n` +
                     `ඔබගේ උපකරණය (${model}) සාදා නිමකර ඇති අතර, පැමිණ ලබාගත හැක. (ටිකට් අංකය: ${ticket})\n\n` +
                     `உங்கள் சாதனம் (${model}) தயாராக உள்ளது. வந்து பெற்றுக்கொள்ளலாம். (டிக்கெட்: ${ticket})`;
       } 
       else if (status === "Completed") {
-        statusMsg = `🏁 *SKY TECHNOLOGIES*\n\n` +
+        statusMsg = `🏁 *SKY TECHNOLOGIES*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
                     `Hello ${name},\nTicket *${ticket}* (${model}) is marked as Completed. Thank you!\n\n` +
                     `SKY TECHNOLOGIES වෙතින් සේවාව ලබාගැනීම ගැන ස්තූතියි! (ටිකට් අංකය: ${ticket})\n\n` +
                     `SKY TECHNOLOGIES தேர்வு செய்ததற்கு நன்றி! (டிக்கெட்: ${ticket})`;
       } 
       else {
-        statusMsg = `ℹ️ *SKY TECHNOLOGIES*\n\n` +
+        statusMsg = `ℹ️ *SKY TECHNOLOGIES*\n` +
+                    `_Sri Lanka Standard Time (SLST)_\n\n` +
                     `Hello ${name},\nYour Ticket *${ticket}* Status: *${status}*.\n\n` +
                     `ඔබගේ ටිකට්පත් තත්ත්වය: ${status}\n\n` +
                     `உங்கள் டிக்கெட் நிலை: ${status}`;
