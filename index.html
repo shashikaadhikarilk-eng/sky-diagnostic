@@ -115,7 +115,7 @@
           </div>
         </div>
 
-        <!-- Serial Number Field (Dedicated Column C) -->
+        <!-- Serial Number Field -->
         <div>
           <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-1">
             <i class="fa-solid fa-barcode text-green-500 mr-1"></i> Serial Number / Tag (Optional)
@@ -242,7 +242,7 @@
             <i class="fa-solid fa-circle-check text-2xl text-green-400 mb-2 block"></i>
             <span class="text-base font-bold text-white">ඔබගේ Booking එක සාර්ථකව යොමු කරන ලදී!</span>
             
-            <!-- Receipt Container -->
+            <!-- Receipt Container (PDF target) -->
             <div id="receiptContainer" class="mt-4 p-4 bg-slate-900 text-left rounded-lg border border-green-500/50 text-gray-200">
               <div class="text-center border-b border-gray-700 pb-2 mb-3">
                 <h3 class="font-brand text-green-400 font-bold text-lg">SKY TECHNOLOGIES</h3>
@@ -281,20 +281,24 @@
       }
     }
 
-    // PDF Download Function
+    // PDF Download Function (Fixed container selector)
     function downloadPDF(ticketNo) {
       const element = document.getElementById('receiptContainer');
+      if (!element) {
+        alert('PDF receipt container not found!');
+        return;
+      }
       const opt = {
         margin:       0.5,
         filename:     `SKY-Receipt-${ticketNo}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, backgroundColor: '#0f172a' },
+        html2canvas:  { scale: 2, backgroundColor: '#0f172a', useCORS: true },
         jsPDF:        { unit: 'in', format: 'a5', orientation: 'portrait' }
       };
       html2pdf().set(opt).from(element).save();
     }
 
-    // Live Track Ticket Status from Google Sheet
+    // Live Track Ticket Status from Google Sheet (Real-time sync with cache bypass)
     async function trackStatus() {
       const searchTicket = document.getElementById('searchTicketNo').value.trim().toUpperCase();
       const trackingResult = document.getElementById('trackingResult');
@@ -305,25 +309,32 @@
       }
 
       trackingResult.classList.remove('hidden');
-      trackingResult.innerHTML = `<p class="text-center text-cyan-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Fetching Live Status...</p>`;
+      trackingResult.innerHTML = `<p class="text-center text-cyan-400 font-bold"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Fetching Live Status from Sheet...</p>`;
 
       try {
-        const response = await fetch(scriptURL);
+        const response = await fetch(scriptURL + '?t=' + new Date().getTime());
         const data = await response.json();
 
-        // Search in fetched Google Sheet JSON data
         const ticket = data.find(item => item.ticketNumber && item.ticketNumber.toString().toUpperCase() === searchTicket);
 
         if (ticket) {
+          let statusText = ticket.status ? ticket.status.toString().trim() : 'New Ticket';
           let statusBadge = 'bg-yellow-600 text-white';
-          if (ticket.status === 'In Progress') statusBadge = 'bg-blue-600 text-white';
-          if (ticket.status === 'Ready For PickUp') statusBadge = 'bg-emerald-600 text-white';
-          if (ticket.status === 'Completed') statusBadge = 'bg-green-600 text-white';
+
+          if (statusText.toLowerCase().includes('progress')) {
+            statusBadge = 'bg-blue-600 text-white';
+          } else if (statusText.toLowerCase().includes('ready')) {
+            statusBadge = 'bg-emerald-600 text-white';
+          } else if (statusText.toLowerCase().includes('completed') || statusText.toLowerCase().includes('done')) {
+            statusBadge = 'bg-green-600 text-white';
+          } else if (statusText.toLowerCase().includes('hold')) {
+            statusBadge = 'bg-red-600 text-white';
+          }
 
           trackingResult.innerHTML = `
             <div class="border-b border-gray-700 pb-2 mb-2 flex justify-between items-center">
               <span class="font-brand text-green-400 font-bold text-sm">${ticket.ticketNumber}</span>
-              <span class="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider ${statusBadge}">${ticket.status || 'New Ticket'}</span>
+              <span class="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider ${statusBadge}">${statusText}</span>
             </div>
             <div class="space-y-1 text-gray-200">
               <p><strong class="text-gray-400">Customer Name:</strong> ${ticket.customerName}</p>
