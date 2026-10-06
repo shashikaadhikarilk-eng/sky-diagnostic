@@ -131,14 +131,14 @@
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx2_Sz-XYIJNZcNpsyao52k1IMzCcRALuMiOUQdEfmQ6UpQCDTuHPilIGDw3E6gHMTjTw/exec';
 
-    function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
       e.preventDefault();
 
       const submitBtn = document.getElementById('submitBtn');
       const statusMessage = document.getElementById('statusMessage');
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> SUBMITTING...`;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> GENERATING TICKET...`;
       statusMessage.className = 'hidden';
 
       const customerName = document.getElementById('customerName').value.trim();
@@ -156,65 +156,67 @@
         faultDescription: faultDescription
       };
 
-      fetch(scriptURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(formData)
-      })
-      .then(res => res.json())
-      .then(response => {
+      try {
+        // Backend එකට Data යවා Response එක ලැබෙන තෙක් Async/Await මගින් රඳවා ගැනීම
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> SUBMIT BOOKING REQUEST`;
 
-        // Backend එකෙන් Ticket Number එක ආවේ නැතත් Frontend එකෙන් Real-time ID එකක් හදා පෙන්වයි
-        let ticketNo = response.ticketNumber;
-        if (!ticketNo || ticketNo === 'Assigned' || ticketNo.trim() === '') {
-          ticketNo = 'SKY-TICK-' + Math.floor(1000 + Math.random() * 9000);
+        if (result.result === 'success' && result.ticketNumber) {
+          const ticketNo = result.ticketNumber; // Google Sheet එකට වැටුණු සැබෑ Ticket Number එක
+          const todayDate = new Date().toLocaleDateString();
+
+          statusMessage.className = 'mt-4 p-4 rounded-lg text-center font-semibold bg-green-900/60 text-green-300 border border-green-500';
+          statusMessage.innerHTML = `
+            <i class="fa-solid fa-circle-check text-2xl text-green-400 mb-2 block"></i>
+            <span class="text-base font-bold text-white">ඔබගේ Booking එක සාර්ථකව යොමු කරන ලදී!</span>
+            
+            <!-- Downloadable Receipt Container (Exact Sheet Data Included) -->
+            <div id="receiptContainer" class="mt-4 p-4 bg-slate-900 text-left rounded-lg border border-green-500/50 text-gray-200">
+              <div class="text-center border-b border-gray-700 pb-2 mb-3">
+                <h3 class="font-brand text-green-400 font-bold text-lg">SKY TECHNOLOGIES</h3>
+                <p class="text-xs text-gray-400">Computer & Motherboard Repair Receipt</p>
+              </div>
+              <div class="space-y-1 text-xs">
+                <p><strong class="text-gray-400">Ticket No:</strong> <span id="receiptTicketNo" class="font-brand text-green-400 font-bold text-sm ml-1">${ticketNo}</span></p>
+                <p><strong class="text-gray-400">Date:</strong> ${todayDate}</p>
+                <p><strong class="text-gray-400">Name:</strong> ${customerName}</p>
+                <p><strong class="text-gray-400">Phone:</strong> ${phoneNumber}</p>
+                <p><strong class="text-gray-400">Device:</strong> ${deviceType} ${deviceModel ? '(' + deviceModel + ')' : ''}</p>
+                <p><strong class="text-gray-400">Issue:</strong> ${faultDescription}</p>
+              </div>
+              <div class="mt-3 text-[10px] text-cyan-400 text-center border-t border-gray-800 pt-2">
+                * Kadawatha Repair Center - Monday Appointments Only
+              </div>
+            </div>
+
+            <!-- PDF Download Button -->
+            <button onclick="downloadPDF('${ticketNo}')" type="button" class="mt-4 w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-lg shadow flex items-center justify-center gap-2 transition text-xs sm:text-sm cursor-pointer">
+              <i class="fa-solid fa-file-arrow-down"></i> DOWNLOAD RECEIPT (PDF)
+            </button>
+          `;
+          document.getElementById('bookingForm').reset();
+        } else {
+          throw new Error('Ticket Number not returned from Sheet');
         }
-
-        const todayDate = new Date().toLocaleDateString();
-
-        statusMessage.className = 'mt-4 p-4 rounded-lg text-center font-semibold bg-green-900/60 text-green-300 border border-green-500';
-        statusMessage.innerHTML = `
-          <i class="fa-solid fa-circle-check text-2xl text-green-400 mb-2 block"></i>
-          <span class="text-base font-bold text-white">ඔබගේ Booking එක සාර්ථකව යොමු කරන ලදී!</span>
-          
-          <!-- Downloadable Receipt Container -->
-          <div id="receiptContainer" class="mt-4 p-4 bg-slate-900 text-left rounded-lg border border-green-500/50 text-gray-200">
-            <div class="text-center border-b border-gray-700 pb-2 mb-3">
-              <h3 class="font-brand text-green-400 font-bold text-lg">SKY TECHNOLOGIES</h3>
-              <p class="text-xs text-gray-400">Computer & Motherboard Repair Receipt</p>
-            </div>
-            <div class="space-y-1 text-xs">
-              <p><strong class="text-gray-400">Ticket No:</strong> <span class="font-brand text-green-400 font-bold text-sm ml-1">${ticketNo}</span></p>
-              <p><strong class="text-gray-400">Date:</strong> ${todayDate}</p>
-              <p><strong class="text-gray-400">Name:</strong> ${customerName}</p>
-              <p><strong class="text-gray-400">Phone:</strong> ${phoneNumber}</p>
-              <p><strong class="text-gray-400">Device:</strong> ${deviceType} ${deviceModel ? '(' + deviceModel + ')' : ''}</p>
-              <p><strong class="text-gray-400">Issue:</strong> ${faultDescription}</p>
-            </div>
-            <div class="mt-3 text-[10px] text-cyan-400 text-center border-t border-gray-800 pt-2">
-              * Kadawatha Repair Center - Monday Appointments Only
-            </div>
-          </div>
-
-          <!-- PDF Download Button -->
-          <button onclick="downloadPDF('${ticketNo}')" type="button" class="mt-4 w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-lg shadow flex items-center justify-center gap-2 transition text-xs sm:text-sm cursor-pointer">
-            <i class="fa-solid fa-file-arrow-down"></i> DOWNLOAD RECEIPT (PDF)
-          </button>
-        `;
-        document.getElementById('bookingForm').reset();
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Error submitting booking:', err);
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> SUBMIT BOOKING REQUEST`;
 
         statusMessage.className = 'mt-4 p-4 rounded-lg text-center text-sm font-semibold bg-red-900/60 text-red-300 border border-red-500';
         statusMessage.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> යොමු කිරීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.`;
-      });
+      }
     }
 
+    // PDF Download Function (Downloads exact receipt with the real Sheet Ticket Number)
     function downloadPDF(ticketNo) {
       const element = document.getElementById('receiptContainer');
       const opt = {
