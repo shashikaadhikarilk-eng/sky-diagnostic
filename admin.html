@@ -75,7 +75,7 @@
   </main>
 
   <script>
-    // Updated Google Apps Script Web App URL
+    // නව Google Apps Script Web App URL එක
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx2_Sz-XYIJNZcNpsyao52k1IMzCcRALuMiOUQdEfmQ6UpQCDTuHPilIGDw3E6gHMTjTw/exec';
 
     const columnsBase = [
@@ -103,10 +103,10 @@
         ticket.status = newStatus;
       }
 
-      // Local UI instant update
+      // UI එක වහාම Update කිරීම
       renderBoard(globalTickets);
 
-      // Backend Google Sheet target row update
+      // Apps Script එකේ අදාළ rowIndex එක පමණක් Update කිරීම
       fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
