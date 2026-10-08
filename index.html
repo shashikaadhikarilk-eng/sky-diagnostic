@@ -150,8 +150,8 @@
               <h2 class="font-brand text-lg font-bold text-green-400">SKY TECHNOLOGIES</h2>
               <p class="text-[10px] text-gray-400">Repair & Diagnostic Slip</p>
             </div>
-            <span id="receiptJobNo" class="font-brand text-lg font-extrabold text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-md border border-cyan-500/40">
-              SKY-1001
+            <span id="receiptJobNo" class="font-brand text-sm font-extrabold text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-md border border-cyan-500/40">
+              SKY-TICK-1001
             </span>
           </div>
 
@@ -163,7 +163,7 @@
             <p><strong class="text-white">Fault:</strong> <span id="receiptFault"></span></p>
           </div>
           <div class="text-[10px] text-center text-gray-500 pt-2 border-t border-gray-800">
-            Keep this Job Number for future reference.
+            Keep this Ticket Number for future reference.
           </div>
         </div>
 
@@ -185,8 +185,8 @@
   </div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR9nl1y6NmuBkIMmZEUBjCKdhJHZDZrj1ArHufE91nG8gKP60WfG4jeYb77fhpQfXa2g/exec";
-    const MY_WHATSAPP_NUMBER = "94771234567";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNMz0qsyBJT39qFvpat4_mbrD1WM3wHlRbYQQsbaopcJyGo2mSQ32Nh0Mtp9Mu6012IQ/exec";
+    const MY_WHATSAPP_NUMBER = "94771234567"; // ඔබගේ WhatsApp අංකය (+94 සහිතව)
 
     function submitToGoogleSheet(e) {
       e.preventDefault();
@@ -211,8 +211,8 @@
             document.getElementById('receiptSerial').innerText = formData.get('serial_number');
             document.getElementById('receiptFault').innerText = formData.get('fault_description');
 
-            const waMsg = `*SKY TECHNOLOGIES - Repair Request*%0A%0A` +
-                          `*Job No:* ${jobNo}%0A` +
+            const waMsg = `*SKY TECHNOLOGIES - Diagnostic Request*%0A%0A` +
+                          `*Ticket No:* ${jobNo}%0A` +
                           `*Name:* ${formData.get('customer_name')}%0A` +
                           `*Device:* ${formData.get('device_type')} (${formData.get('device_model')})%0A` +
                           `*Fault:* ${formData.get('fault_description')}`;
