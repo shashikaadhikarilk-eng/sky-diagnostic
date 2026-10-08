@@ -36,13 +36,13 @@
 </head>
 <body class="p-4 sm:p-6 flex items-center justify-center min-h-screen">
 
-  <!-- 1. LOGIN SCREEN -->
+  <!-- LOGIN SCREEN -->
   <div id="loginSection" class="w-full max-w-md sky-card p-8 text-center space-y-6">
     <div class="space-y-2">
       <h1 class="font-brand text-2xl font-extrabold text-white">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-xs font-semibold text-cyan-400 tracking-wider uppercase">Admin Control Panel</p>
+      <p class="text-xs font-semibold text-cyan-400 tracking-wider uppercase">Admin Management Panel</p>
     </div>
 
     <form onsubmit="checkLogin(event)" class="space-y-4">
@@ -51,7 +51,7 @@
         <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full sky-input px-4 py-3 text-center text-lg tracking-widest">
       </div>
       
-      <p id="errorMsg" class="text-red-400 text-xs hidden">❌ Invalid Password! Please try again.</p>
+      <p id="errorMsg" class="text-red-400 text-xs hidden">❌ Invalid Password! Try again.</p>
 
       <button type="submit" class="w-full font-brand bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-bold py-3 rounded-xl shadow-lg transition cursor-pointer">
         LOGIN TO PANEL
@@ -59,16 +59,16 @@
     </form>
   </div>
 
-  <!-- 2. ADMIN DASHBOARD (Hidden by default) -->
-  <div id="dashboardSection" class="hidden w-full max-w-6xl space-y-6">
+  <!-- ADMIN DASHBOARD -->
+  <div id="dashboardSection" class="hidden w-full max-w-7xl space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-green-900/50 pb-4">
       <div>
         <h1 class="font-brand text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-xs text-cyan-400">Repair Jobs & Diagnostic Status Management</p>
+        <p class="text-xs text-cyan-400">Ticket Status & Repair Control Dashboard</p>
       </div>
       <div class="flex items-center gap-3">
         <button onclick="loadJobs()" class="bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2 rounded-lg text-sm transition">
-          🔄 Refresh Jobs
+          🔄 Refresh Tickets
         </button>
         <button onclick="logout()" class="bg-red-950/80 border border-red-500/50 hover:bg-red-900 text-red-300 font-bold px-3 py-2 rounded-lg text-sm transition">
           🚪 Logout
@@ -76,12 +76,12 @@
       </div>
     </div>
 
-    <!-- Jobs Table -->
+    <!-- Tickets Table -->
     <div class="sky-card overflow-x-auto p-4">
       <table class="w-full text-left text-sm text-gray-300">
         <thead class="text-xs uppercase bg-green-950/60 text-green-400">
           <tr>
-            <th class="p-3">Job No</th>
+            <th class="p-3">Ticket No</th>
             <th class="p-3">Customer</th>
             <th class="p-3">Phone</th>
             <th class="p-3">Device</th>
@@ -92,7 +92,7 @@
         </thead>
         <tbody id="jobsTable">
           <tr>
-            <td colspan="7" class="text-center p-6 text-gray-500">Loading jobs data...</td>
+            <td colspan="7" class="text-center p-6 text-gray-500">Loading repair tickets...</td>
           </tr>
         </tbody>
       </table>
@@ -100,12 +100,24 @@
   </div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR9nl1y6NmuBkIMmZEUBjCKdhJHZDZrj1ArHufE91nG8gKP60WfG4jeYb77fhpQfXa2g/exec";
-    
-    // 🔑 මෙතැනට ඔබට අවශ්‍ය Admin Password එක යොදන්න:
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNMz0qsyBJT39qFvpat4_mbrD1WM3wHlRbYQQsbaopcJyGo2mSQ32Nh0Mtp9Mu6012IQ/exec";
     const ADMIN_PASSWORD = "SKY@123";
 
-    // Auto check if already logged in during this session
+    const STATUS_OPTIONS = [
+      "New Ticket",
+      "On Hold (Not Confirm Customer)",
+      "Confirmed Customer",
+      "In Process",
+      "Parts Ordered",
+      "Parts Pending",
+      "Payment Pending",
+      "Cannot Repair Products",
+      "Ready for Pickup / Delivery",
+      "Out for Delivery",
+      "Delivered to Customer",
+      "Completed / Closed"
+    ];
+
     window.onload = function() {
       if (sessionStorage.getItem("sky_admin_logged") === "true") {
         showDashboard();
@@ -115,14 +127,11 @@
     function checkLogin(e) {
       e.preventDefault();
       const enteredPass = document.getElementById("adminPassword").value;
-      const errorMsg = document.getElementById("errorMsg");
-
       if (enteredPass === ADMIN_PASSWORD) {
         sessionStorage.setItem("sky_admin_logged", "true");
-        errorMsg.classList.add("hidden");
         showDashboard();
       } else {
-        errorMsg.classList.remove("hidden");
+        document.getElementById("errorMsg").classList.remove("hidden");
         document.getElementById("adminPassword").value = "";
       }
     }
@@ -137,24 +146,28 @@
       sessionStorage.removeItem("sky_admin_logged");
       document.getElementById("dashboardSection").classList.add("hidden");
       document.getElementById("loginSection").classList.remove("hidden");
-      document.getElementById("adminPassword").value = "";
     }
 
     function loadJobs() {
       const tbody = document.getElementById('jobsTable');
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-cyan-400 animate-pulse">Fetching repair records from Google Sheets...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-cyan-400 animate-pulse">Fetching records from Google Sheets...</td></tr>';
 
       fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
         .then(res => res.json())
         .then(data => {
           tbody.innerHTML = '';
-          
           if(!data || !data.length) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-gray-500">No repair jobs found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-gray-500">No repair tickets found.</td></tr>';
             return;
           }
 
           data.forEach(job => {
+            let optionsHTML = '<option value="">-- Change Status --</option>';
+            STATUS_OPTIONS.forEach(st => {
+              const selected = (job.status === st) ? 'selected' : '';
+              optionsHTML += `<option value="${st}" ${selected}>${st}</option>`;
+            });
+
             tbody.innerHTML += `
               <tr class="border-b border-gray-800 hover:bg-black/40 transition">
                 <td class="p-3 font-brand text-cyan-400 font-bold">${job.jobNo}</td>
@@ -163,18 +176,13 @@
                 <td class="p-3"><span class="text-emerald-400 font-medium">${job.device}</span> <br><span class="text-xs text-gray-500">${job.model}</span></td>
                 <td class="p-3 max-w-xs text-xs text-gray-300 truncate" title="${job.fault}">${job.fault}</td>
                 <td class="p-3">
-                  <span class="px-2.5 py-1 bg-green-950/80 border border-green-500/40 text-green-400 text-xs font-semibold rounded-full">
-                    ${job.status || 'Received'}
+                  <span class="px-2.5 py-1 bg-green-950/80 border border-green-500/40 text-green-400 text-xs font-semibold rounded-full inline-block">
+                    ${job.status || 'New Ticket'}
                   </span>
                 </td>
                 <td class="p-3">
                   <select onchange="updateStatus('${job.jobNo}', this.value, '${job.phone}')" class="bg-slate-900 border border-green-800 text-xs rounded-lg p-2 text-white hover:border-green-500 focus:outline-none">
-                    <option value="">-- Change Status --</option>
-                    <option value="Received">Received</option>
-                    <option value="Diagnosing">Diagnosing</option>
-                    <option value="Waiting for Parts">Waiting for Parts</option>
-                    <option value="Repair Completed">Repair Completed</option>
-                    <option value="Delivered">Delivered</option>
+                    ${optionsHTML}
                   </select>
                 </td>
               </tr>
@@ -182,7 +190,7 @@
           });
         })
         .catch(err => {
-          tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-red-400">Failed to load data. Please check connection or Web App deployment settings.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-red-400">Failed to load data. Please check connection or Web App deployment.</td></tr>';
         });
     }
 
@@ -198,11 +206,10 @@
         .then(res => res.json())
         .then(data => {
           if(data.result === 'success') {
-            alert(`Job ${jobNo} status updated to: ${newStatus}`);
+            alert(`Ticket ${jobNo} status updated to: ${newStatus}`);
             
-            // Open WhatsApp with Status Update Message
-            const cleanPhone = phone.replace(/^0/, '94');
-            const waMsg = `*SKY TECHNOLOGIES Status Update*%0A%0A*Job No:* ${jobNo}%0A*Status:* ${newStatus}`;
+            const cleanPhone = phone.toString().replace(/^0/, '94');
+            const waMsg = `*SKY TECHNOLOGIES Status Update*%0A%0A*Ticket No:* ${jobNo}%0A*Status:* ${newStatus}%0A%0AThank you!`;
             window.open(`https://wa.me/${cleanPhone}?text=${waMsg}`, '_blank');
             
             loadJobs();
