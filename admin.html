@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Kanban Board</title>
+  <title>SKY TECHNOLOGIES - Fast Kanban Board</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SortableJS Library for Drag & Drop -->
+  <!-- SortableJS Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -30,21 +30,19 @@
       color: #38bdf8;
       border-radius: 8px;
     }
-    /* Kanban Dragging Styles */
     .kanban-col {
-      min-height: 450px;
-      max-height: calc(100vh - 180px);
+      min-height: 480px;
+      max-height: calc(100vh - 170px);
     }
     .ghost-card {
-      opacity: 0.4;
-      background: rgba(34, 197, 94, 0.2) !important;
+      opacity: 0.3;
+      background: rgba(34, 197, 94, 0.15) !important;
       border: 2px dashed #22c55e !important;
     }
     .chosen-card {
       transform: scale(1.02);
       box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
     }
-    /* Custom Scrollbar for Horizontal Dragging */
     .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 10px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
@@ -53,13 +51,13 @@
 </head>
 <body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between">
 
-  <!-- LOGIN SCREEN -->
+  <!-- 1. LOGIN SCREEN -->
   <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto">
     <div class="space-y-1">
       <h1 class="font-brand text-2xl font-extrabold text-white">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Kanban Admin Dashboard</p>
+      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Fast Kanban Control Center</p>
     </div>
 
     <form onsubmit="checkLogin(event)" class="space-y-4">
@@ -67,26 +65,23 @@
         <label class="block text-xs text-gray-400 mb-1">Enter Admin Password</label>
         <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full sky-input px-4 py-3 text-center text-lg tracking-widest">
       </div>
-      
       <p id="errorMsg" class="text-red-400 text-xs hidden">❌ Invalid Password! Try again.</p>
-
       <button type="submit" class="w-full font-brand bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-extrabold py-3.5 rounded-xl shadow-lg transition active:scale-95 cursor-pointer text-sm">
         LOGIN TO BOARD
       </button>
     </form>
   </div>
 
-  <!-- KANBAN BOARD DASHBOARD -->
+  <!-- 2. KANBAN BOARD DASHBOARD -->
   <div id="dashboardSection" class="hidden w-full space-y-4">
-    <!-- Header Controls -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-green-900/50 pb-3">
       <div>
         <h1 class="font-brand text-xl sm:text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-[11px] sm:text-xs text-cyan-400">Drag & Drop Repair Workflow Management</p>
+        <p class="text-[11px] sm:text-xs text-cyan-400">Drag & Drop Instant Workflow Management</p>
       </div>
       <div class="flex items-center gap-2 w-full sm:w-auto">
         <button onclick="loadJobs()" class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🔄 Refresh Board
+          🔄 Refresh
         </button>
         <button onclick="logout()" class="bg-red-950/80 border border-red-500/50 hover:bg-red-900 text-red-300 font-bold px-3 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
           🚪 Logout
@@ -94,30 +89,30 @@
       </div>
     </div>
 
-    <!-- KANBAN COLUMNS CONTAINER (Horizontal Scrollable) -->
+    <!-- Kanban Container -->
     <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start">
-      <!-- Columns Will Be Auto-Generated Here -->
+      <!-- Generated Fast via Script -->
     </div>
   </div>
 
-  <!-- WHATSAPP MESSAGE EDIT MODAL -->
+  <!-- 3. CUSTOMIZABLE WHATSAPP MODAL -->
   <div id="waModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
     <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl relative my-auto">
       <div class="flex justify-between items-center border-b border-gray-700 pb-2.5">
-        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 Trilingual WhatsApp Notification</h3>
+        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 Send WhatsApp Message</h3>
         <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
       </div>
       
-      <p class="text-[11px] sm:text-xs text-gray-400">පහත සකස් කළ පණිවිඩය අවශ්‍ය පරිදි වෙනස් කර (Edit) WhatsApp යවන්න:</p>
+      <p class="text-[11px] sm:text-xs text-gray-300">පහත පණිවිඩය අවශ්‍ය පරිදි **Edit කර** කස්ටමර්ට යවන්න:</p>
 
-      <textarea id="waMessageText" rows="10" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
+      <textarea id="waMessageText" rows="11" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
 
       <div class="flex flex-col sm:flex-row gap-2">
         <button onclick="sendWaMessage()" class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition active:scale-95">
           🚀 Send WhatsApp Message
         </button>
         <button onclick="closeWaModal()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-4 py-2.5 rounded-xl text-xs transition">
-          Cancel
+          Close Window
         </button>
       </div>
     </div>
@@ -148,8 +143,8 @@
 *Ticket No:* {JOB_NO}
 *Device:* {DEVICE} ({MODEL})
 
-ENG: Your repair ticket has been created successfully. We will start the diagnosis soon.
-SIN: ඔබගේ උපකරණය භාර ගන්නා ලදී. පරීක්ෂා කිරීම ළඟදීම ආරම්භ කෙරේ.
+ENG: Your repair ticket has been created successfully. We will start diagnosis soon.
+SIN: ඔබගේ උපකරණය භාර ගන්නා ලදී. පරික්ෂා කිරීම ළඟදීම ආරම්භ කෙරේ.
 TAM: உங்கள் சாதனம் பெறப்பட்டது. விரைவில் பரிசோதனை தொடங்கப்படும்.`,
 
       "On Hold (Not Confirm Customer)": 
@@ -157,7 +152,7 @@ TAM: உங்கள் சாதனம் பெறப்பட்டது. �
 *Ticket No:* {JOB_NO}
 *Device:* {DEVICE} ({MODEL})
 
-ENG: Your repair is on hold. Please contact us to confirm your repair approval.
+ENG: Your repair is on hold. Please contact us to confirm repair approval.
 SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව තාවකාලිකව පවති. කරුණාකර අලුත්වැඩියාව තහවුරු කිරීමට අප හා සම්බන්ධ වන්න.
 TAM: உங்கள் பழுதுபார்ப்பு நிறுத்தி வைக்கப்பட்டுள்ளது. உறுதிப்படுத்த எங்களை தொடர்பு கொள்ளவும்.`,
 
@@ -202,9 +197,9 @@ TAM: பழுதுபார்ப்ப தொடர தேவையான உ
 *Ticket No:* {JOB_NO}
 *Device:* {DEVICE} ({MODEL})
 
-ENG: Repair is ready. Please complete the pending payment to proceed with delivery/pickup.
+ENG: Repair is ready. Please complete pending payment to proceed with delivery/pickup.
 SIN: අලුත්වැඩියාව අවසන්. කරුණාකර උපකරණය ලබා ගැනීමට පෙර ගෙවීම් සම්පූර්ණ කරන්න.
-TAM: பழுதுபார்ப்பு முடிந்தது. சாதனத்தைப் பெற நிலுவைச் செலுத்தவும்.`,
+TAM: பழுதுபார்ப்பு முடிந்தது. சாதனத்தைப் பெற நிலුவைச் செலுத்தவும்.`,
 
       "Cannot Repair Products": 
 `🛠️ *SKY TECHNOLOGIES - Status Update*
@@ -262,8 +257,7 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
 
     function checkLogin(e) {
       e.preventDefault();
-      const enteredPass = document.getElementById("adminPassword").value;
-      if (enteredPass === ADMIN_PASSWORD) {
+      if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) {
         sessionStorage.setItem("sky_admin_logged", "true");
         showDashboard();
       } else {
@@ -284,49 +278,49 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
       document.getElementById("loginSection").classList.remove("hidden");
     }
 
+    // High Speed Render Optimization
     function loadJobs() {
       const board = document.getElementById('kanbanBoard');
-      board.innerHTML = '<div class="text-cyan-400 animate-pulse text-center w-full py-10 font-bold">Loading Kanban Board...</div>';
+      board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Fast Loading Kanban Data...</div>';
 
       fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
         .then(res => res.json())
         .then(data => {
           board.innerHTML = '';
+          const fragment = document.createDocumentFragment();
 
-          // Create Columns for each Status
           STATUS_OPTIONS.forEach(statusTitle => {
-            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-0]/g, '')}`;
-            
-            // Filter jobs belonging to this status
+            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-9]/g, '')}`;
             const filteredJobs = data ? data.filter(j => (j.status || "New Ticket") === statusTitle) : [];
 
-            board.innerHTML += `
-              <div class="sky-card w-80 min-w-[300px] flex flex-col p-3 rounded-2xl flex-shrink-0">
-                <div class="flex justify-between items-center border-b border-green-900/50 pb-2 mb-3 px-1">
-                  <h3 class="font-brand text-xs font-bold text-green-400 uppercase tracking-wide truncate max-w-[200px]" title="${statusTitle}">
-                    ${statusTitle}
-                  </h3>
-                  <span class="bg-green-950 text-green-400 border border-green-600/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    ${filteredJobs.length}
-                  </span>
-                </div>
-
-                <!-- Sortable Cards Container -->
-                <div id="${colId}" data-status="${statusTitle}" class="kanban-col space-y-3 overflow-y-auto custom-scroll p-1 flex-1">
-                  ${filteredJobs.map(job => createCardHTML(job)).join('')}
-                </div>
+            const colDiv = document.createElement('div');
+            colDiv.className = 'sky-card w-80 min-w-[300px] flex flex-col p-3 rounded-2xl flex-shrink-0';
+            colDiv.innerHTML = `
+              <div class="flex justify-between items-center border-b border-green-900/50 pb-2 mb-3 px-1">
+                <h3 class="font-brand text-xs font-bold text-green-400 uppercase tracking-wide truncate max-w-[200px]" title="${statusTitle}">
+                  ${statusTitle}
+                </h3>
+                <span id="badge-${colId}" class="bg-green-950 text-green-400 border border-green-600/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  ${filteredJobs.length}
+                </span>
+              </div>
+              <div id="${colId}" data-status="${statusTitle}" class="kanban-col space-y-3 overflow-y-auto custom-scroll p-1 flex-1">
+                ${filteredJobs.map(job => createCardHTML(job)).join('')}
               </div>
             `;
+            fragment.appendChild(colDiv);
           });
 
-          // Initialize SortableJS on every Kanban Column
+          board.appendChild(fragment);
+
+          // Attach Sortable JS handlers
           STATUS_OPTIONS.forEach(statusTitle => {
-            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-0]/g, '')}`;
+            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-9]/g, '')}`;
             const el = document.getElementById(colId);
 
             new Sortable(el, {
               group: 'kanban-workflow',
-              animation: 200,
+              animation: 150,
               ghostClass: 'ghost-card',
               chosenClass: 'chosen-card',
               onEnd: function (evt) {
@@ -340,21 +334,22 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
                   const device = itemEl.getAttribute('data-device');
                   const model = itemEl.getAttribute('data-model');
 
-                  updateStatus(jobNo, newStatus, phone, device, model);
+                  // Show Instant WhatsApp Popup and sync
+                  handleDragUpdate(jobNo, newStatus, phone, device, model);
                 }
               }
             });
           });
         })
         .catch(err => {
-          board.innerHTML = '<div class="text-red-400 text-center w-full py-10">Failed to load Kanban data.</div>';
+          board.innerHTML = '<div class="text-red-400 text-center w-full py-10">Failed to load data.</div>';
         });
     }
 
     function createCardHTML(job) {
       return `
         <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}"
-             class="bg-black/70 border border-gray-800 hover:border-green-500/60 p-3.5 rounded-xl cursor-grab active:cursor-grabbing transition shadow-md hover:shadow-green-900/20 space-y-2">
+             class="bg-black/80 border border-gray-800 hover:border-green-500/60 p-3.5 rounded-xl cursor-grab active:cursor-grabbing transition shadow-md hover:shadow-green-900/20 space-y-2">
           
           <div class="flex justify-between items-center border-b border-gray-800/80 pb-1.5">
             <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
@@ -370,7 +365,19 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
       `;
     }
 
-    function updateStatus(jobNo, newStatus, phone, device, model) {
+    function handleDragUpdate(jobNo, newStatus, phone, device, model) {
+      // 1. Prepare Trilingual WhatsApp Template Immediately
+      let template = TRILINGUAL_MESSAGES[newStatus] || TRILINGUAL_MESSAGES["New Ticket"];
+      let formattedMsg = template
+        .replace(/{JOB_NO}/g, jobNo)
+        .replace(/{DEVICE}/g, device)
+        .replace(/{MODEL}/g, model);
+
+      pendingWaPhone = phone.toString().replace(/^0/, '94');
+      document.getElementById('waMessageText').value = formattedMsg;
+      document.getElementById('waModal').classList.remove('hidden');
+
+      // 2. Sync Status Update to Google Sheets Background Process
       const formData = new FormData();
       formData.append('action', 'updateStatus');
       formData.append('jobNo', jobNo);
@@ -379,20 +386,8 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
       fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
         .then(res => res.json())
         .then(data => {
-          if(data.result === 'success') {
-            let template = TRILINGUAL_MESSAGES[newStatus] || TRILINGUAL_MESSAGES["New Ticket"];
-            let formattedMsg = template
-              .replace('{JOB_NO}', jobNo)
-              .replace('{DEVICE}', device)
-              .replace('{MODEL}', model);
-
-            pendingWaPhone = phone.toString().replace(/^0/, '94');
-            document.getElementById('waMessageText').value = formattedMsg;
-            document.getElementById('waModal').classList.remove('hidden');
-            
-            loadJobs(); // Refresh counts
-          } else {
-            alert('Error updating status: ' + data.message);
+          if (data.result !== 'success') {
+            alert('Failed to update status on Google Sheet!');
           }
         });
     }
