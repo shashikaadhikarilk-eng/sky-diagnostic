@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Admin Panel</title>
+  <title>SKY TECHNOLOGIES - Kanban Board</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SortableJS Library for Drag & Drop -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -28,22 +30,36 @@
       color: #38bdf8;
       border-radius: 8px;
     }
-    .sky-input:focus {
-      outline: none;
-      border-color: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    /* Kanban Dragging Styles */
+    .kanban-col {
+      min-height: 450px;
+      max-height: calc(100vh - 180px);
     }
+    .ghost-card {
+      opacity: 0.4;
+      background: rgba(34, 197, 94, 0.2) !important;
+      border: 2px dashed #22c55e !important;
+    }
+    .chosen-card {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    }
+    /* Custom Scrollbar for Horizontal Dragging */
+    .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.8); }
   </style>
 </head>
-<body class="p-3 sm:p-6 flex items-center justify-center min-h-screen">
+<body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between">
 
   <!-- LOGIN SCREEN -->
-  <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto">
+  <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto">
     <div class="space-y-1">
       <h1 class="font-brand text-2xl font-extrabold text-white">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Admin Control Panel</p>
+      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Kanban Admin Dashboard</p>
     </div>
 
     <form onsubmit="checkLogin(event)" class="space-y-4">
@@ -55,21 +71,22 @@
       <p id="errorMsg" class="text-red-400 text-xs hidden">❌ Invalid Password! Try again.</p>
 
       <button type="submit" class="w-full font-brand bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black font-extrabold py-3.5 rounded-xl shadow-lg transition active:scale-95 cursor-pointer text-sm">
-        LOGIN TO PANEL
+        LOGIN TO BOARD
       </button>
     </form>
   </div>
 
-  <!-- ADMIN DASHBOARD -->
-  <div id="dashboardSection" class="hidden w-full max-w-7xl space-y-4 sm:space-y-6">
+  <!-- KANBAN BOARD DASHBOARD -->
+  <div id="dashboardSection" class="hidden w-full space-y-4">
+    <!-- Header Controls -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-green-900/50 pb-3">
       <div>
         <h1 class="font-brand text-xl sm:text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-[11px] sm:text-xs text-cyan-400">Ticket Status & Trilingual WhatsApp Dashboard</p>
+        <p class="text-[11px] sm:text-xs text-cyan-400">Drag & Drop Repair Workflow Management</p>
       </div>
       <div class="flex items-center gap-2 w-full sm:w-auto">
         <button onclick="loadJobs()" class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🔄 Refresh
+          🔄 Refresh Board
         </button>
         <button onclick="logout()" class="bg-red-950/80 border border-red-500/50 hover:bg-red-900 text-red-300 font-bold px-3 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
           🚪 Logout
@@ -77,29 +94,9 @@
       </div>
     </div>
 
-    <!-- Desktop Table View (Hidden on Mobile) -->
-    <div class="hidden md:block sky-card overflow-x-auto p-4">
-      <table class="w-full text-left text-sm text-gray-300">
-        <thead class="text-xs uppercase bg-green-950/60 text-green-400">
-          <tr>
-            <th class="p-3">Ticket No</th>
-            <th class="p-3">Customer</th>
-            <th class="p-3">Phone</th>
-            <th class="p-3">Device</th>
-            <th class="p-3">Fault Description</th>
-            <th class="p-3">Current Status</th>
-            <th class="p-3">Update Status</th>
-          </tr>
-        </thead>
-        <tbody id="jobsTableDesktop">
-          <tr><td colspan="7" class="text-center p-6 text-gray-500">Loading tickets...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Mobile Responsive Cards View (Visible on Mobile) -->
-    <div id="jobsCardsMobile" class="md:hidden space-y-3">
-      <div class="text-center p-6 text-gray-500 sky-card">Loading tickets...</div>
+    <!-- KANBAN COLUMNS CONTAINER (Horizontal Scrollable) -->
+    <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start">
+      <!-- Columns Will Be Auto-Generated Here -->
     </div>
   </div>
 
@@ -107,11 +104,11 @@
   <div id="waModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
     <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl relative my-auto">
       <div class="flex justify-between items-center border-b border-gray-700 pb-2.5">
-        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 Edit & Send WhatsApp Message</h3>
+        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 Trilingual WhatsApp Notification</h3>
         <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
       </div>
       
-      <p class="text-[11px] sm:text-xs text-gray-400">මැසේජ් එක යැවීමට පෙර අවශ්‍ය නම් පහතින් වෙනස්කම් (Edit) කරන්න:</p>
+      <p class="text-[11px] sm:text-xs text-gray-400">පහත සකස් කළ පණිවිඩය අවශ්‍ය පරිදි වෙනස් කර (Edit) WhatsApp යවන්න:</p>
 
       <textarea id="waMessageText" rows="10" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
 
@@ -288,85 +285,92 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
     }
 
     function loadJobs() {
-      const tbodyDesktop = document.getElementById('jobsTableDesktop');
-      const cardsMobile = document.getElementById('jobsCardsMobile');
-      
-      tbodyDesktop.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-cyan-400 animate-pulse">Fetching records...</td></tr>';
-      cardsMobile.innerHTML = '<div class="text-center p-6 text-cyan-400 animate-pulse sky-card">Fetching records...</div>';
+      const board = document.getElementById('kanbanBoard');
+      board.innerHTML = '<div class="text-cyan-400 animate-pulse text-center w-full py-10 font-bold">Loading Kanban Board...</div>';
 
       fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
         .then(res => res.json())
         .then(data => {
-          tbodyDesktop.innerHTML = '';
-          cardsMobile.innerHTML = '';
+          board.innerHTML = '';
 
-          if(!data || !data.length) {
-            tbodyDesktop.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-gray-500">No repair tickets found.</td></tr>';
-            cardsMobile.innerHTML = '<div class="text-center p-6 text-gray-500 sky-card">No repair tickets found.</div>';
-            return;
-          }
+          // Create Columns for each Status
+          STATUS_OPTIONS.forEach(statusTitle => {
+            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-0]/g, '')}`;
+            
+            // Filter jobs belonging to this status
+            const filteredJobs = data ? data.filter(j => (j.status || "New Ticket") === statusTitle) : [];
 
-          data.forEach(job => {
-            let optionsHTML = '<option value="">-- Select Status --</option>';
-            STATUS_OPTIONS.forEach(st => {
-              const selected = (job.status === st) ? 'selected' : '';
-              optionsHTML += `<option value="${st}" ${selected}>${st}</option>`;
-            });
-
-            // Desktop Row HTML
-            tbodyDesktop.innerHTML += `
-              <tr class="border-b border-gray-800 hover:bg-black/40 transition">
-                <td class="p-3 font-brand text-cyan-400 font-bold">${job.jobNo}</td>
-                <td class="p-3 font-semibold text-white">${job.name}</td>
-                <td class="p-3 text-gray-400">${job.phone}</td>
-                <td class="p-3"><span class="text-emerald-400 font-medium">${job.device}</span> <br><span class="text-xs text-gray-500">${job.model}</span></td>
-                <td class="p-3 max-w-xs text-xs text-gray-300 truncate" title="${job.fault}">${job.fault}</td>
-                <td class="p-3">
-                  <span class="px-2.5 py-1 bg-green-950/80 border border-green-500/40 text-green-400 text-xs font-semibold rounded-full inline-block">
-                    ${job.status || 'New Ticket'}
-                  </span>
-                </td>
-                <td class="p-3">
-                  <select onchange='updateStatus("${job.jobNo}", this.value, "${job.phone}", "${job.device}", "${job.model}")' class="bg-slate-900 border border-green-800 text-xs rounded-lg p-2 text-white hover:border-green-500 focus:outline-none">
-                    ${optionsHTML}
-                  </select>
-                </td>
-              </tr>
-            `;
-
-            // Mobile Card HTML
-            cardsMobile.innerHTML += `
-              <div class="sky-card p-4 space-y-3">
-                <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                  <span class="font-brand text-cyan-400 font-bold text-sm">${job.jobNo}</span>
-                  <span class="px-2 py-0.5 bg-green-950/90 border border-green-500/40 text-green-400 text-[11px] font-semibold rounded-full">
-                    ${job.status || 'New Ticket'}
+            board.innerHTML += `
+              <div class="sky-card w-80 min-w-[300px] flex flex-col p-3 rounded-2xl flex-shrink-0">
+                <div class="flex justify-between items-center border-b border-green-900/50 pb-2 mb-3 px-1">
+                  <h3 class="font-brand text-xs font-bold text-green-400 uppercase tracking-wide truncate max-w-[200px]" title="${statusTitle}">
+                    ${statusTitle}
+                  </h3>
+                  <span class="bg-green-950 text-green-400 border border-green-600/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    ${filteredJobs.length}
                   </span>
                 </div>
-                <div class="text-xs space-y-1 text-gray-300">
-                  <p><strong class="text-white">Customer:</strong> ${job.name} (${job.phone})</p>
-                  <p><strong class="text-white">Device:</strong> <span class="text-emerald-400">${job.device}</span> - ${job.model}</p>
-                  <p><strong class="text-white">Fault:</strong> ${job.fault}</p>
-                </div>
-                <div class="pt-2 border-t border-gray-800/60">
-                  <label class="block text-[10px] text-gray-400 mb-1 font-semibold">UPDATE STATUS:</label>
-                  <select onchange='updateStatus("${job.jobNo}", this.value, "${job.phone}", "${job.device}", "${job.model}")' class="w-full bg-slate-900 border border-green-800 text-xs rounded-xl p-2.5 text-white focus:border-green-500">
-                    ${optionsHTML}
-                  </select>
+
+                <!-- Sortable Cards Container -->
+                <div id="${colId}" data-status="${statusTitle}" class="kanban-col space-y-3 overflow-y-auto custom-scroll p-1 flex-1">
+                  ${filteredJobs.map(job => createCardHTML(job)).join('')}
                 </div>
               </div>
             `;
           });
+
+          // Initialize SortableJS on every Kanban Column
+          STATUS_OPTIONS.forEach(statusTitle => {
+            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-0]/g, '')}`;
+            const el = document.getElementById(colId);
+
+            new Sortable(el, {
+              group: 'kanban-workflow',
+              animation: 200,
+              ghostClass: 'ghost-card',
+              chosenClass: 'chosen-card',
+              onEnd: function (evt) {
+                const itemEl = evt.item;
+                const newStatus = evt.to.getAttribute('data-status');
+                const oldStatus = evt.from.getAttribute('data-status');
+
+                if (newStatus !== oldStatus) {
+                  const jobNo = itemEl.getAttribute('data-jobno');
+                  const phone = itemEl.getAttribute('data-phone');
+                  const device = itemEl.getAttribute('data-device');
+                  const model = itemEl.getAttribute('data-model');
+
+                  updateStatus(jobNo, newStatus, phone, device, model);
+                }
+              }
+            });
+          });
         })
         .catch(err => {
-          tbodyDesktop.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-red-400">Failed to load data.</td></tr>';
-          cardsMobile.innerHTML = '<div class="text-center p-6 text-red-400 sky-card">Failed to load data.</div>';
+          board.innerHTML = '<div class="text-red-400 text-center w-full py-10">Failed to load Kanban data.</div>';
         });
     }
 
+    function createCardHTML(job) {
+      return `
+        <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}"
+             class="bg-black/70 border border-gray-800 hover:border-green-500/60 p-3.5 rounded-xl cursor-grab active:cursor-grabbing transition shadow-md hover:shadow-green-900/20 space-y-2">
+          
+          <div class="flex justify-between items-center border-b border-gray-800/80 pb-1.5">
+            <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
+            <span class="text-[10px] text-gray-400 font-medium">${job.phone}</span>
+          </div>
+
+          <div class="text-xs space-y-1">
+            <p class="font-semibold text-white">${job.name}</p>
+            <p class="text-emerald-400 font-medium">${job.device} <span class="text-gray-400 text-[10px]">(${job.model})</span></p>
+            <p class="text-gray-400 text-[11px] line-clamp-2" title="${job.fault}">${job.fault}</p>
+          </div>
+        </div>
+      `;
+    }
+
     function updateStatus(jobNo, newStatus, phone, device, model) {
-      if(!newStatus) return;
-      
       const formData = new FormData();
       formData.append('action', 'updateStatus');
       formData.append('jobNo', jobNo);
@@ -386,7 +390,7 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
             document.getElementById('waMessageText').value = formattedMsg;
             document.getElementById('waModal').classList.remove('hidden');
             
-            loadJobs();
+            loadJobs(); // Refresh counts
           } else {
             alert('Error updating status: ' + data.message);
           }
