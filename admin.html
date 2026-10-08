@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SKY TECHNOLOGIES - Fast Kanban Board</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SortableJS Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -46,7 +45,6 @@
     .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 10px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.8); }
   </style>
 </head>
 <body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between">
@@ -90,26 +88,24 @@
     </div>
 
     <!-- Kanban Container -->
-    <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start">
-      <!-- Generated Fast via Script -->
-    </div>
+    <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start"></div>
   </div>
 
-  <!-- 3. CUSTOMIZABLE WHATSAPP MODAL -->
+  <!-- 3. SIDE QUICK WHATSAPP CHAT DRAWER -->
   <div id="waModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
     <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl relative my-auto">
       <div class="flex justify-between items-center border-b border-gray-700 pb-2.5">
-        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 Send WhatsApp Message</h3>
+        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 WhatsApp Direct Messaging Box</h3>
         <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
       </div>
       
-      <p class="text-[11px] sm:text-xs text-gray-300">පහත පණිවිඩය අවශ්‍ය පරිදි **Edit කර** කස්ටමර්ට යවන්න:</p>
+      <p class="text-[11px] sm:text-xs text-gray-300">පහත Message එක අවශ්‍ය පරිදි Edit කර ත්‍රිභාෂාවෙන්ම එකවර යවන්න:</p>
 
       <textarea id="waMessageText" rows="11" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
 
       <div class="flex flex-col sm:flex-row gap-2">
         <button onclick="sendWaMessage()" class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🚀 Send WhatsApp Message
+          🚀 Open WhatsApp & Send Message
         </button>
         <button onclick="closeWaModal()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-4 py-2.5 rounded-xl text-xs transition">
           Close Window
@@ -147,24 +143,6 @@ ENG: Your repair ticket has been created successfully. We will start diagnosis s
 SIN: ඔබගේ උපකරණය භාර ගන්නා ලදී. පරික්ෂා කිරීම ළඟදීම ආරම්භ කෙරේ.
 TAM: உங்கள் சாதனம் பெறப்பட்டது. விரைவில் பரிசோதனை தொடங்கப்படும்.`,
 
-      "On Hold (Not Confirm Customer)": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Your repair is on hold. Please contact us to confirm repair approval.
-SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව තාවකාලිකව පවති. කරුණාකර අලුත්වැඩියාව තහවුරු කිරීමට අප හා සම්බන්ධ වන්න.
-TAM: உங்கள் பழுதுபார்ப்பு நிறுத்தி வைக்கப்பட்டுள்ளது. உறுதிப்படுத்த எங்களை தொடர்பு கொள்ளவும்.`,
-
-      "Confirmed Customer": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Thank you for confirming. We have scheduled your device for repair.
-SIN: අලුත්වැඩියා කටයුතු තහවුරු කිරීමට ස්තූතියි. ඔබගේ උපකරණයේ වැඩ කටයුතු ආරම්භ කරන ලදී.
-TAM: உறுதிப்படுத்தியதற்கு நன்றி. உங்கள் சாதனத்தின் பழுதுபார்ப்பு தொடங்கப்பட்டது.`,
-
       "In Process": 
 `🛠️ *SKY TECHNOLOGIES - Status Update*
 *Ticket No:* {JOB_NO}
@@ -174,42 +152,6 @@ ENG: Your device is currently undergoing diagnostic / repair process.
 SIN: ඔබගේ උපකරණයේ අලුත්වැඩියා කටයුතු මේ වන විට සිදුවෙමින් පවතී.
 TAM: உங்கள் சாதனம் தற்போது பழுதுபார்க்கப்பட்டு வருகிறது.`,
 
-      "Parts Ordered": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Required spare parts have been ordered for your device.
-SIN: අලුත්වැඩියාව සඳහා අවශ්‍ය කොටස් (Spare Parts) Order කර ඇත.
-TAM: பழுதுபார்ப்பிற்கு தேவையான உதிரிபாகங்கள் ஆர்டர் செய்யப்பட்டுள்ளன.`,
-
-      "Parts Pending": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Waiting for required spare parts delivery to continue the repair.
-SIN: අලුත්වැඩියා කටයුතු ඉදිරියට කරගෙන යාම සඳහා කොටස් ලැබෙන තෙක් රැඳී සිටී.
-TAM: பழுதுபார்ப்ப தொடர தேவையான உதிரிபாகங்கள் வருகைக்காக காத்திருக்கிறது.`,
-
-      "Payment Pending": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Repair is ready. Please complete pending payment to proceed with delivery/pickup.
-SIN: අලුත්වැඩියාව අවසන්. කරුණාකර උපකරණය ලබා ගැනීමට පෙර ගෙවීම් සම්පූර්ණ කරන්න.
-TAM: பழுதுபார்ப்பு முடிந்தது. சாதனத்தைப் பெற நிலුவைச் செலுத்தவும்.`,
-
-      "Cannot Repair Products": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Unfortunately, your device cannot be repaired due to severe board/chip damage. Please collect your device.
-SIN: කණගාටුයි, උපකරණයේ පවතින දැඩි දෝෂය නිසා අලුත්වැඩියා කිරීමට නොහැක. කරුණාකර උපකරණය නැවත ලබාගන්න.
-TAM: மன்னிக்கவும், கடுமையான கோளாறு காரணமாக பழுதுபார்க்க முடியாது. சாதனத்தை திரும்பப் பெறவும்.`,
-
       "Ready for Pickup / Delivery": 
 `🛠️ *SKY TECHNOLOGIES - Status Update*
 *Ticket No:* {JOB_NO}
@@ -217,34 +159,7 @@ TAM: மன்னிக்கவும், கடுமையான கோளா
 
 ENG: Your repair is COMPLETED! Your device is ready for pickup/delivery.
 SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව සාර්ථකව නිම කර ඇත. දැන් පැමිණ ලබාගත හැක.
-TAM: உங்கள் பழுதுபார்ப்பு முடிந்தது! சாதனத்தை இப்போது பெற்றுக்கொள்ளலாம்.`,
-
-      "Out for Delivery": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Your device is dispatched and out for delivery to your location.
-SIN: ඔබගේ උපකරණය බෙදා හැරීම සඳහා (Delivery) යොමු කර ඇත.
-TAM: உங்கள் சாதனம் விநியோகத்திற்காக அனுப்பப்பட்டுள்ளது.`,
-
-      "Delivered to Customer": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Device successfully delivered. Thank you for choosing SKY TECHNOLOGIES!
-SIN: උපකරණය සාර්ථකව පාරිභෝගිකයා වෙත භාර දෙන ලදී. SKY TECHNOLOGIES වෙත පැමිණි ඔබට ස්තූතියි!
-TAM: சாதனம் வெற்றிகரமாக ஒப்படைக்கப்பட்டது. நன்றி!`,
-
-      "Completed / Closed": 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* {JOB_NO}
-*Device:* {DEVICE} ({MODEL})
-
-ENG: Ticket completed and closed. Thank you for your business!
-SIN: ඔබගේ Ticket එක සාර්ථකව අවසන් කර වසා දමන ලදී. ස්තූතියි!
-TAM: உங்கள் பழுதுபார்ப்பு செயல்முறை நிறைவடைந்தது. நன்றி!`
+TAM: உங்கள் பழுதுபார்ப்பு முடிந்தது! சாதனத்தை இப்போது பெற்றுக்கொள்ளலாம்.`
     };
 
     let pendingWaPhone = "";
@@ -278,7 +193,6 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
       document.getElementById("loginSection").classList.remove("hidden");
     }
 
-    // High Speed Render Optimization
     function loadJobs() {
       const board = document.getElementById('kanbanBoard');
       board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Fast Loading Kanban Data...</div>';
@@ -300,7 +214,7 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
                 <h3 class="font-brand text-xs font-bold text-green-400 uppercase tracking-wide truncate max-w-[200px]" title="${statusTitle}">
                   ${statusTitle}
                 </h3>
-                <span id="badge-${colId}" class="bg-green-950 text-green-400 border border-green-600/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span class="bg-green-950 text-green-400 border border-green-600/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
                   ${filteredJobs.length}
                 </span>
               </div>
@@ -313,7 +227,6 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
 
           board.appendChild(fragment);
 
-          // Attach Sortable JS handlers
           STATUS_OPTIONS.forEach(statusTitle => {
             const colId = `col-${statusTitle.replace(/[^a-zA-Z0-9]/g, '')}`;
             const el = document.getElementById(colId);
@@ -334,7 +247,6 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
                   const device = itemEl.getAttribute('data-device');
                   const model = itemEl.getAttribute('data-model');
 
-                  // Show Instant WhatsApp Popup and sync
                   handleDragUpdate(jobNo, newStatus, phone, device, model);
                 }
               }
@@ -353,7 +265,9 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
           
           <div class="flex justify-between items-center border-b border-gray-800/80 pb-1.5">
             <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
-            <span class="text-[10px] text-gray-400 font-medium">${job.phone}</span>
+            <button onclick="openCustomChat('${job.jobNo}', '${job.phone}', '${job.device}', '${job.model}')" class="text-[10px] bg-emerald-950 hover:bg-emerald-800 text-emerald-400 border border-emerald-600/40 px-2 py-0.5 rounded transition">
+              💬 Quick Chat
+            </button>
           </div>
 
           <div class="text-xs space-y-1">
@@ -366,30 +280,28 @@ TAM: உங்கள் பழுதுபார்ப்பு செயல்�
     }
 
     function handleDragUpdate(jobNo, newStatus, phone, device, model) {
-      // 1. Prepare Trilingual WhatsApp Template Immediately
-      let template = TRILINGUAL_MESSAGES[newStatus] || TRILINGUAL_MESSAGES["New Ticket"];
-      let formattedMsg = template
-        .replace(/{JOB_NO}/g, jobNo)
-        .replace(/{DEVICE}/g, device)
-        .replace(/{MODEL}/g, model);
+      let template = TRILINGUAL_MESSAGES[newStatus] || 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* ${jobNo}
+*Device:* ${device} (${model})
+*Status:* ${newStatus}`;
 
       pendingWaPhone = phone.toString().replace(/^0/, '94');
-      document.getElementById('waMessageText').value = formattedMsg;
+      document.getElementById('waMessageText').value = template;
       document.getElementById('waModal').classList.remove('hidden');
 
-      // 2. Sync Status Update to Google Sheets Background Process
       const formData = new FormData();
       formData.append('action', 'updateStatus');
       formData.append('jobNo', jobNo);
       formData.append('status', newStatus);
 
-      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-          if (data.result !== 'success') {
-            alert('Failed to update status on Google Sheet!');
-          }
-        });
+      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+    }
+
+    function openCustomChat(jobNo, phone, device, model) {
+      pendingWaPhone = phone.toString().replace(/^0/, '94');
+      document.getElementById('waMessageText').value = `Hello! Regarding your repair Ticket ${jobNo} (${device} ${model}):\n\n`;
+      document.getElementById('waModal').classList.remove('hidden');
     }
 
     function sendWaMessage() {
