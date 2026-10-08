@@ -64,7 +64,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-green-900/50 pb-4">
       <div>
         <h1 class="font-brand text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-xs text-cyan-400">Ticket Status & Repair Control Dashboard</p>
+        <p class="text-xs text-cyan-400">Ticket Status & Trilingual WhatsApp Notification Control</p>
       </div>
       <div class="flex items-center gap-3">
         <button onclick="loadJobs()" class="bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2 rounded-lg text-sm transition">
@@ -99,6 +99,29 @@
     </div>
   </div>
 
+  <!-- WHATSAPP MESSAGE EDIT MODAL -->
+  <div id="waModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative">
+      <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+        <h3 class="font-brand text-green-400 font-bold text-base">💬 Edit & Send WhatsApp Message</h3>
+        <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-lg">&times;</button>
+      </div>
+      
+      <p class="text-xs text-gray-400">ඔබට අවශ්‍ය නම් පහත මැසේජ් එක වෙනස් කර (Edit කර) කස්ටමර්ට WhatsApp යැවිය හැක:</p>
+
+      <textarea id="waMessageText" rows="12" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
+
+      <div class="flex gap-3">
+        <button onclick="sendWaMessage()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg text-sm transition">
+          🚀 Send WhatsApp Message
+        </button>
+        <button onclick="closeWaModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-5 py-3 rounded-lg text-xs transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNMz0qsyBJT39qFvpat4_mbrD1WM3wHlRbYQQsbaopcJyGo2mSQ32Nh0Mtp9Mu6012IQ/exec";
     const ADMIN_PASSWORD = "SKY@123";
@@ -117,6 +140,119 @@
       "Delivered to Customer",
       "Completed / Closed"
     ];
+
+    // Trilingual Default Message Templates for each Status Process
+    const TRILINGUAL_MESSAGES = {
+      "New Ticket": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Your repair ticket has been created successfully. We will start the diagnosis soon.
+SIN: ඔබගේ උපකරණය භාර ගන්නා ලදී. පරීක්ෂා කිරීම ළඟදීම ආරම්භ කෙරේ.
+TAM: உங்கள் சாதனம் பெறப்பட்டது. விரைவில் பரிசோதனை தொடங்கப்படும்.`,
+
+      "On Hold (Not Confirm Customer)": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Your repair is on hold. Please contact us to confirm your repair approval.
+SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව තාවකාලිකව පවති. කරුණාකර අලුත්වැඩියාව තහවුරු කිරීමට අප හා සම්බන්ධ වන්න.
+TAM: உங்கள் பழுதுபார்ப்பு நிறுத்தி வைக்கப்பட்டுள்ளது. உறுதிப்படுத்த எங்களை தொடர்பு கொள்ளவும்.`,
+
+      "Confirmed Customer": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Thank you for confirming. We have scheduled your device for repair.
+SIN: අලුත්වැඩියා කටයුතු තහවුරු කිරීමට ස්තූතියි. ඔබගේ උපකරණයේ වැඩ කටයුතු ආරම්භ කරන ලදී.
+TAM: உறுதிப்படுத்தியதற்கு நன்றி. உங்கள் சாதனத்தின் பழுதுபார்ப்பு தொடங்கப்பட்டது.`,
+
+      "In Process": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Your device is currently undergoing diagnostic / repair process.
+SIN: ඔබගේ උපකරණයේ අලුත්වැඩියා කටයුතු මේ වන විට සිදුවෙමින් පවතී.
+TAM: உங்கள் சாதனம் தற்போது பழுதுபார்க்கப்பட்டு வருகிறது.`,
+
+      "Parts Ordered": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Required spare parts have been ordered for your device.
+SIN: අලුත්වැඩියාව සඳහා අවශ්‍ය කොටස් (Spare Parts) Order කර ඇත.
+TAM: பழுதுபார்ப்பிற்கு தேவையான உதிரிபாகங்கள் ஆர்டர் செய்யப்பட்டுள்ளன.`,
+
+      "Parts Pending": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Waiting for required spare parts delivery to continue the repair.
+SIN: අලුත්වැඩියා කටයුතු ඉදිරියට කරගෙන යාම සඳහා කොටස් ලැබෙන තෙක් රැඳී සිටී.
+TAM: பழுதுபார்ப்ப தொடர தேவையான உதிரிபாகங்கள் வருகைக்காக காத்திருக்கிறது.`,
+
+      "Payment Pending": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Repair is ready. Please complete the pending payment to proceed with delivery/pickup.
+SIN: අලුත්වැඩියාව අවසන්. කරුණාකර උපකරණය ලබා ගැනීමට පෙර ගෙවීම් සම්පූර්ණ කරන්න.
+TAM: பழுதுபார்ப்பு முடிந்தது. சாதனத்தைப் பெற நிலுவைச் செலுத்தவும்.`,
+
+      "Cannot Repair Products": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Unfortunately, your device cannot be repaired due to severe board/chip damage. Please collect your device.
+SIN: කණගාටුයි, උපකරණයේ පවතින දැඩි දෝෂය නිසා අලුත්වැඩියා කිරීමට නොහැක. කරුණාකර උපකරණය නැවත ලබාගන්න.
+TAM: மன்னிக்கவும், கடுமையான கோளாறு காரணமாக பழுதுபார்க்க முடியாது. சாதனத்தை திரும்பப் பெறவும்.`,
+
+      "Ready for Pickup / Delivery": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Your repair is COMPLETED! Your device is ready for pickup/delivery.
+SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව සාර්ථකව නිම කර ඇත. දැන් පැමිණ ලබාගත හැක.
+TAM: உங்கள் பழுதுபார்ப்பு முடிந்தது! சாதனத்தை இப்போது பெற்றுக்கொள்ளலாம்.`,
+
+      "Out for Delivery": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Your device is dispatched and out for delivery to your location.
+SIN: ඔබගේ උපකරණය බෙදා හැරීම සඳහා (Delivery) යොමු කර ඇත.
+TAM: உங்கள் சாதனம் விநியோகத்திற்காக அனுப்பப்பட்டுள்ளது.`,
+
+      "Delivered to Customer": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Device successfully delivered. Thank you for choosing SKY TECHNOLOGIES!
+SIN: උපකරණය සාර්ථකව පාරිභෝගිකයා වෙත භාර දෙන ලදී. SKY TECHNOLOGIES වෙත පැමිණි ඔබට ස්තූතියි!
+TAM: சாதனம் வெற்றிகரமாக ஒப்படைக்கப்பட்டது. நன்றி!`,
+
+      "Completed / Closed": 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* {JOB_NO}
+*Device:* {DEVICE} ({MODEL})
+
+ENG: Ticket completed and closed. Thank you for your business!
+SIN: ඔබගේ Ticket එක සාර්ථකව අවසන් කර වසා දමන ලදී. ස්තූතියි!
+TAM: உங்கள் பழுதுபார்ப்பு செயல்முறை நிறைவடைந்தது. நன்றி!`
+    };
+
+    let pendingWaPhone = "";
 
     window.onload = function() {
       if (sessionStorage.getItem("sky_admin_logged") === "true") {
@@ -168,6 +304,9 @@
               optionsHTML += `<option value="${st}" ${selected}>${st}</option>`;
             });
 
+            // Escape quotes for safely passing to JS function
+            const safeJob = JSON.stringify(job).replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
             tbody.innerHTML += `
               <tr class="border-b border-gray-800 hover:bg-black/40 transition">
                 <td class="p-3 font-brand text-cyan-400 font-bold">${job.jobNo}</td>
@@ -181,7 +320,7 @@
                   </span>
                 </td>
                 <td class="p-3">
-                  <select onchange="updateStatus('${job.jobNo}', this.value, '${job.phone}')" class="bg-slate-900 border border-green-800 text-xs rounded-lg p-2 text-white hover:border-green-500 focus:outline-none">
+                  <select onchange='updateStatus("${job.jobNo}", this.value, "${job.phone}", "${job.device}", "${job.model}")' class="bg-slate-900 border border-green-800 text-xs rounded-lg p-2 text-white hover:border-green-500 focus:outline-none">
                     ${optionsHTML}
                   </select>
                 </td>
@@ -190,11 +329,11 @@
           });
         })
         .catch(err => {
-          tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-red-400">Failed to load data. Please check connection or Web App deployment.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-red-400">Failed to load data. Please check Web App URL.</td></tr>';
         });
     }
 
-    function updateStatus(jobNo, newStatus, phone) {
+    function updateStatus(jobNo, newStatus, phone, device, model) {
       if(!newStatus) return;
       
       const formData = new FormData();
@@ -206,17 +345,32 @@
         .then(res => res.json())
         .then(data => {
           if(data.result === 'success') {
-            alert(`Ticket ${jobNo} status updated to: ${newStatus}`);
-            
-            const cleanPhone = phone.toString().replace(/^0/, '94');
-            const waMsg = `*SKY TECHNOLOGIES Status Update*%0A%0A*Ticket No:* ${jobNo}%0A*Status:* ${newStatus}%0A%0AThank you!`;
-            window.open(`https://wa.me/${cleanPhone}?text=${waMsg}`, '_blank');
+            // Prepare Trilingual Default Message
+            let template = TRILINGUAL_MESSAGES[newStatus] || TRILINGUAL_MESSAGES["New Ticket"];
+            let formattedMsg = template
+              .replace('{JOB_NO}', jobNo)
+              .replace('{DEVICE}', device)
+              .replace('{MODEL}', model);
+
+            pendingWaPhone = phone.toString().replace(/^0/, '94');
+            document.getElementById('waMessageText').value = formattedMsg;
+            document.getElementById('waModal').classList.remove('hidden');
             
             loadJobs();
           } else {
             alert('Error updating status: ' + data.message);
           }
         });
+    }
+
+    function sendWaMessage() {
+      const msg = encodeURIComponent(document.getElementById('waMessageText').value);
+      window.open(`https://wa.me/${pendingWaPhone}?text=${msg}`, '_blank');
+      closeWaModal();
+    }
+
+    function closeWaModal() {
+      document.getElementById('waModal').classList.add('hidden');
     }
   </script>
 </body>
