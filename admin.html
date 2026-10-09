@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Automated Meta Kanban</title>
+  <title>SKY TECHNOLOGIES - Custom Meta Messaging Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
       min-height: 100vh;
       color: #e2e8f0;
       -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
     .font-brand { font-family: 'Orbitron', sans-serif; }
     .sky-card {
@@ -29,6 +30,11 @@
       color: #38bdf8;
       border-radius: 10px;
     }
+    .sky-input:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
     .kanban-col {
       min-height: 480px;
       max-height: calc(100vh - 170px);
@@ -42,6 +48,9 @@
       transform: scale(1.02);
       box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
     }
+    .drawer-slide {
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 10px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
@@ -50,17 +59,17 @@
 <body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between relative">
 
   <!-- NOTIFICATION TOAST -->
-  <div id="toast" class="hidden fixed bottom-5 right-5 bg-slate-900 border border-green-500/80 text-green-400 font-semibold px-4 py-3 rounded-xl shadow-2xl z-50 transition-all flex items-center gap-2">
+  <div id="toast" class="hidden fixed bottom-5 left-5 bg-slate-900 border border-green-500/80 text-green-400 font-semibold px-4 py-3 rounded-xl shadow-2xl z-50 transition-all flex items-center gap-2">
     <span id="toastMsg">Processing...</span>
   </div>
 
-  <!-- LOGIN SCREEN -->
+  <!-- 1. LOGIN SCREEN -->
   <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto z-10">
     <div class="space-y-1">
       <h1 class="font-brand text-2xl font-extrabold text-white">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Auto Background Sync Admin</p>
+      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Custom Message Admin Portal</p>
     </div>
 
     <form onsubmit="checkLogin(event)" class="space-y-4">
@@ -75,16 +84,16 @@
     </form>
   </div>
 
-  <!-- MAIN KANBAN DASHBOARD -->
+  <!-- 2. MAIN KANBAN DASHBOARD -->
   <div id="dashboardSection" class="hidden w-full space-y-4">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-green-900/50 pb-3">
       <div>
         <h1 class="font-brand text-xl sm:text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-[11px] sm:text-xs text-cyan-400">100% Background Automated Meta Messaging System</p>
+        <p class="text-[11px] sm:text-xs text-cyan-400">Drag & Drop + Custom Message Auto Sync</p>
       </div>
       <div class="flex items-center gap-2 w-full sm:w-auto">
         <button onclick="loadJobs()" class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🔄 Refresh Board
+          🔄 Refresh
         </button>
         <button onclick="logout()" class="bg-red-950/80 border border-red-500/50 hover:bg-red-900 text-red-300 font-bold px-3 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
           🚪 Logout
@@ -92,8 +101,62 @@
       </div>
     </div>
 
-    <!-- Kanban Columns -->
+    <!-- Kanban Board Scrollable Columns -->
     <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start"></div>
+  </div>
+
+  <!-- 3. SLIDE-OVER MESSAGE CUSTOMIZER DRAWER -->
+  <div id="drawerOverlay" onclick="closeDrawer()" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40 transition-opacity"></div>
+  
+  <div id="chatDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-slate-950 border-l border-green-500/40 z-50 p-5 shadow-2xl flex flex-col justify-between translate-x-full drawer-slide">
+    
+    <div class="space-y-4">
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">✍️</span>
+          <div>
+            <h3 class="font-brand text-green-400 font-bold text-sm" id="drawerJobNo">SKY-TICK-XXXX</h3>
+            <p class="text-[10px] text-cyan-400 uppercase tracking-wider" id="drawerCustomerName">Customize Notification Message</p>
+          </div>
+        </div>
+        <button onclick="closeDrawer()" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-lg flex items-center justify-center transition">
+          &times;
+        </button>
+      </div>
+
+      <!-- Target Status & Recipient Info -->
+      <div class="bg-black/60 border border-green-900/50 rounded-xl p-3 text-xs space-y-1">
+        <div class="flex justify-between">
+          <span class="text-gray-400">NEW STATUS:</span>
+          <strong id="drawerStatus" class="text-emerald-400 uppercase font-brand">In Process</strong>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">RECIPIENT:</span>
+          <strong id="drawerPhone" class="text-cyan-300 font-mono">+94 7X XXX XXXX</strong>
+        </div>
+      </div>
+
+      <!-- Editable Message Text Area -->
+      <div class="space-y-1">
+        <label class="block text-xs font-semibold text-gray-300 flex justify-between">
+          <span>EDIT MESSAGE TEXT:</span>
+          <span class="text-[10px] text-gray-400">(Type anything custom here)</span>
+        </label>
+        <textarea id="customMessageArea" rows="11" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed custom-scroll"></textarea>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="space-y-2 pt-3 border-t border-gray-800">
+      <button onclick="confirmAndSendCustomWA()" class="w-full font-brand bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-extrabold py-3.5 rounded-xl shadow-lg transition active:scale-95 text-xs tracking-wider flex items-center justify-center gap-2">
+        🚀 SEND THIS CUSTOM MESSAGE NOW
+      </button>
+      <button onclick="closeDrawer()" class="w-full bg-slate-900 hover:bg-slate-800 text-gray-400 font-bold py-2 rounded-xl text-xs transition">
+        Cancel & Close
+      </button>
+    </div>
+
   </div>
 
   <script>
@@ -143,6 +206,8 @@ ENG: Your repair is COMPLETED! Your device is ready for pickup/delivery.
 SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව සාර්ථකව නිම කර ඇත. දැන් පැමිණ ලබාගත හැක.
 TAM: உங்கள் பழுதுபார்ப்பு முடிந்தது! சாதனத்தை இப்போது பெற்றுக்கொள்ளலாம்.`
     };
+
+    let activeJobData = {};
 
     window.onload = function() {
       if (sessionStorage.getItem("sky_admin_logged") === "true") {
@@ -226,8 +291,9 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
                   const phone = itemEl.getAttribute('data-phone');
                   const device = itemEl.getAttribute('data-device');
                   const model = itemEl.getAttribute('data-model');
+                  const name = itemEl.getAttribute('data-name');
 
-                  handleAutoBackgroundSync(jobNo, newStatus, phone, device, model);
+                  openCustomizerDrawer(jobNo, newStatus, phone, device, model, name);
                 }
               }
             });
@@ -240,12 +306,15 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
 
     function createCardHTML(job) {
       return `
-        <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}"
+        <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}" data-name="${job.name}"
              class="bg-black/80 border border-gray-800 hover:border-green-500/60 p-3.5 rounded-xl cursor-grab active:cursor-grabbing transition shadow-md hover:shadow-green-900/20 space-y-2">
           
           <div class="flex justify-between items-center border-b border-gray-800/80 pb-1.5">
             <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
-            <span class="text-[10px] text-gray-400 font-medium">${job.phone}</span>
+            <button onclick="openCustomizerDrawer('${job.jobNo}', '${job.status || 'New Ticket'}', '${job.phone}', '${job.device}', '${job.model}', '${job.name}')" 
+                    class="text-[10px] bg-emerald-950 hover:bg-emerald-800 text-emerald-400 border border-emerald-600/40 px-2 py-0.5 rounded transition active:scale-95">
+              ✍️ Customize
+            </button>
           </div>
 
           <div class="text-xs space-y-1">
@@ -257,8 +326,13 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
       `;
     }
 
-    function handleAutoBackgroundSync(jobNo, newStatus, phone, device, model) {
-      showToast(`🔄 Updating ${jobNo} & Sending Auto WhatsApp...`);
+    function openCustomizerDrawer(jobNo, newStatus, phone, device, model, name) {
+      activeJobData = { jobNo, newStatus, phone, device, model, name };
+
+      document.getElementById('drawerJobNo').innerText = jobNo;
+      document.getElementById('drawerCustomerName').innerText = `${name} - ${device}`;
+      document.getElementById('drawerStatus').innerText = newStatus;
+      document.getElementById('drawerPhone').innerText = phone;
 
       let template = TRILINGUAL_MESSAGES[newStatus] || 
 `🛠️ *SKY TECHNOLOGIES - Status Update*
@@ -271,20 +345,41 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
         .replace(/{DEVICE}/g, device)
         .replace(/{MODEL}/g, model);
 
+      document.getElementById('customMessageArea').value = formattedMsg;
+
+      document.getElementById('drawerOverlay').classList.remove('hidden');
+      document.getElementById('chatDrawer').classList.remove('translate-x-full');
+    }
+
+    function closeDrawer() {
+      document.getElementById('chatDrawer').classList.add('translate-x-full');
+      document.getElementById('drawerOverlay').classList.add('hidden');
+    }
+
+    function confirmAndSendCustomWA() {
+      const customMsg = document.getElementById('customMessageArea').value;
+      if (!customMsg.trim()) {
+        alert("Please enter a message!");
+        return;
+      }
+
+      closeDrawer();
+      showToast(`🔄 Syncing Sheet & Sending Custom WhatsApp...`);
+
       const formData = new FormData();
       formData.append('action', 'updateStatusAndSendWA');
-      formData.append('jobNo', jobNo);
-      formData.append('status', newStatus);
-      formData.append('phone', phone);
-      formData.append('message', formattedMsg);
+      formData.append('jobNo', activeJobData.jobNo);
+      formData.append('status', activeJobData.newStatus);
+      formData.append('phone', activeJobData.phone);
+      formData.append('message', customMsg);
 
       fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
         .then(res => res.json())
         .then(data => {
-          showToast(`✅ Status Updated & WhatsApp Sent Automatically!`);
+          showToast(`✅ Status Updated & Custom WhatsApp Sent!`);
         })
         .catch(err => {
-          showToast(`❌ Error sending auto WhatsApp notification.`);
+          showToast(`❌ Error sending message.`);
         });
     }
 
