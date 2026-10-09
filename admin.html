@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Fast Kanban Board</title>
+  <title>SKY TECHNOLOGIES - Automated Meta Kanban</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -18,16 +18,16 @@
     .font-brand { font-family: 'Orbitron', sans-serif; }
     .sky-card {
       background: rgba(10, 18, 14, 0.85);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(34, 197, 94, 0.25);
       border-radius: 16px;
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
     }
     .sky-input {
-      background: rgba(5, 12, 8, 0.85);
+      background: rgba(5, 12, 8, 0.9);
       border: 1px solid rgba(34, 197, 94, 0.35);
       color: #38bdf8;
-      border-radius: 8px;
+      border-radius: 10px;
     }
     .kanban-col {
       min-height: 480px;
@@ -47,15 +47,20 @@
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
   </style>
 </head>
-<body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between">
+<body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between relative">
 
-  <!-- 1. LOGIN SCREEN -->
-  <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto">
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 bg-slate-900 border border-green-500/80 text-green-400 font-semibold px-4 py-3 rounded-xl shadow-2xl z-50 transition-all flex items-center gap-2">
+    <span id="toastMsg">Processing...</span>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto z-10">
     <div class="space-y-1">
       <h1 class="font-brand text-2xl font-extrabold text-white">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Fast Kanban Control Center</p>
+      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Auto Background Sync Admin</p>
     </div>
 
     <form onsubmit="checkLogin(event)" class="space-y-4">
@@ -70,16 +75,16 @@
     </form>
   </div>
 
-  <!-- 2. KANBAN BOARD DASHBOARD -->
+  <!-- MAIN KANBAN DASHBOARD -->
   <div id="dashboardSection" class="hidden w-full space-y-4">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-green-900/50 pb-3">
       <div>
         <h1 class="font-brand text-xl sm:text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-[11px] sm:text-xs text-cyan-400">Drag & Drop Instant Workflow Management</p>
+        <p class="text-[11px] sm:text-xs text-cyan-400">100% Background Automated Meta Messaging System</p>
       </div>
       <div class="flex items-center gap-2 w-full sm:w-auto">
         <button onclick="loadJobs()" class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🔄 Refresh
+          🔄 Refresh Board
         </button>
         <button onclick="logout()" class="bg-red-950/80 border border-red-500/50 hover:bg-red-900 text-red-300 font-bold px-3 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
           🚪 Logout
@@ -87,35 +92,12 @@
       </div>
     </div>
 
-    <!-- Kanban Container -->
+    <!-- Kanban Columns -->
     <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start"></div>
   </div>
 
-  <!-- 3. SIDE QUICK WHATSAPP CHAT DRAWER -->
-  <div id="waModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
-    <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl relative my-auto">
-      <div class="flex justify-between items-center border-b border-gray-700 pb-2.5">
-        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 WhatsApp Direct Messaging Box</h3>
-        <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
-      </div>
-      
-      <p class="text-[11px] sm:text-xs text-gray-300">පහත Message එක අවශ්‍ය පරිදි Edit කර ත්‍රිභාෂාවෙන්ම එකවර යවන්න:</p>
-
-      <textarea id="waMessageText" rows="11" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
-
-      <div class="flex flex-col sm:flex-row gap-2">
-        <button onclick="sendWaMessage()" class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🚀 Open WhatsApp & Send Message
-        </button>
-        <button onclick="closeWaModal()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-4 py-2.5 rounded-xl text-xs transition">
-          Close Window
-        </button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNMz0qsyBJT39qFvpat4_mbrD1WM3wHlRbYQQsbaopcJyGo2mSQ32Nh0Mtp9Mu6012IQ/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj6RlYPQCccascvaUc8MRAhLJ2_oHPsyWCgoKgJh95iYLRL9LxYUXBC9pU1S8-wZbliw/exec";
     const ADMIN_PASSWORD = "SKY@123";
 
     const STATUS_OPTIONS = [
@@ -162,8 +144,6 @@ SIN: ඔබගේ උපකරණයේ අලුත්වැඩියාව ස
 TAM: உங்கள் பழுதுபார்ப்பு முடிந்தது! சாதனத்தை இப்போது பெற்றுக்கொள்ளலாம்.`
     };
 
-    let pendingWaPhone = "";
-
     window.onload = function() {
       if (sessionStorage.getItem("sky_admin_logged") === "true") {
         showDashboard();
@@ -195,7 +175,7 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
 
     function loadJobs() {
       const board = document.getElementById('kanbanBoard');
-      board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Fast Loading Kanban Data...</div>';
+      board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Loading Kanban Board...</div>';
 
       fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
         .then(res => res.json())
@@ -247,7 +227,7 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
                   const device = itemEl.getAttribute('data-device');
                   const model = itemEl.getAttribute('data-model');
 
-                  handleDragUpdate(jobNo, newStatus, phone, device, model);
+                  handleAutoBackgroundSync(jobNo, newStatus, phone, device, model);
                 }
               }
             });
@@ -265,9 +245,7 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
           
           <div class="flex justify-between items-center border-b border-gray-800/80 pb-1.5">
             <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
-            <button onclick="openCustomChat('${job.jobNo}', '${job.phone}', '${job.device}', '${job.model}')" class="text-[10px] bg-emerald-950 hover:bg-emerald-800 text-emerald-400 border border-emerald-600/40 px-2 py-0.5 rounded transition">
-              💬 Quick Chat
-            </button>
+            <span class="text-[10px] text-gray-400 font-medium">${job.phone}</span>
           </div>
 
           <div class="text-xs space-y-1">
@@ -279,39 +257,42 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
       `;
     }
 
-    function handleDragUpdate(jobNo, newStatus, phone, device, model) {
+    function handleAutoBackgroundSync(jobNo, newStatus, phone, device, model) {
+      showToast(`🔄 Updating ${jobNo} & Sending Auto WhatsApp...`);
+
       let template = TRILINGUAL_MESSAGES[newStatus] || 
 `🛠️ *SKY TECHNOLOGIES - Status Update*
 *Ticket No:* ${jobNo}
 *Device:* ${device} (${model})
 *Status:* ${newStatus}`;
 
-      pendingWaPhone = phone.toString().replace(/^0/, '94');
-      document.getElementById('waMessageText').value = template;
-      document.getElementById('waModal').classList.remove('hidden');
+      let formattedMsg = template
+        .replace(/{JOB_NO}/g, jobNo)
+        .replace(/{DEVICE}/g, device)
+        .replace(/{MODEL}/g, model);
 
       const formData = new FormData();
-      formData.append('action', 'updateStatus');
+      formData.append('action', 'updateStatusAndSendWA');
       formData.append('jobNo', jobNo);
       formData.append('status', newStatus);
+      formData.append('phone', phone);
+      formData.append('message', formattedMsg);
 
-      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+          showToast(`✅ Status Updated & WhatsApp Sent Automatically!`);
+        })
+        .catch(err => {
+          showToast(`❌ Error sending auto WhatsApp notification.`);
+        });
     }
 
-    function openCustomChat(jobNo, phone, device, model) {
-      pendingWaPhone = phone.toString().replace(/^0/, '94');
-      document.getElementById('waMessageText').value = `Hello! Regarding your repair Ticket ${jobNo} (${device} ${model}):\n\n`;
-      document.getElementById('waModal').classList.remove('hidden');
-    }
-
-    function sendWaMessage() {
-      const msg = encodeURIComponent(document.getElementById('waMessageText').value);
-      window.open(`https://wa.me/${pendingWaPhone}?text=${msg}`, '_blank');
-      closeWaModal();
-    }
-
-    function closeWaModal() {
-      document.getElementById('waModal').classList.add('hidden');
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3500);
     }
   </script>
 </body>
