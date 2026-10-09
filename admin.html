@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Fast Kanban Board</title>
+  <title>SKY TECHNOLOGIES - Ultimate Admin Kanban</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -14,20 +14,26 @@
       min-height: 100vh;
       color: #e2e8f0;
       -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
     .font-brand { font-family: 'Orbitron', sans-serif; }
     .sky-card {
       background: rgba(10, 18, 14, 0.85);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(34, 197, 94, 0.25);
       border-radius: 16px;
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
     }
     .sky-input {
-      background: rgba(5, 12, 8, 0.85);
+      background: rgba(5, 12, 8, 0.9);
       border: 1px solid rgba(34, 197, 94, 0.35);
       color: #38bdf8;
-      border-radius: 8px;
+      border-radius: 10px;
+    }
+    .sky-input:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
     }
     .kanban-col {
       min-height: 480px;
@@ -42,20 +48,25 @@
       transform: scale(1.02);
       box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
     }
+    /* Smooth Drawer Animation */
+    .drawer-slide {
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 10px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.8); }
   </style>
 </head>
-<body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between">
+<body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between relative">
 
   <!-- 1. LOGIN SCREEN -->
-  <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto">
+  <div id="loginSection" class="w-full max-w-md sky-card p-6 sm:p-8 text-center space-y-6 my-auto mx-auto z-10">
     <div class="space-y-1">
       <h1 class="font-brand text-2xl font-extrabold text-white">
         SKY <span class="text-green-500">TECHNOLOGIES</span>
       </h1>
-      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Fast Kanban Control Center</p>
+      <p class="text-[11px] font-semibold text-cyan-400 tracking-wider uppercase">Ultimate Admin Portal</p>
     </div>
 
     <form onsubmit="checkLogin(event)" class="space-y-4">
@@ -70,12 +81,12 @@
     </form>
   </div>
 
-  <!-- 2. KANBAN BOARD DASHBOARD -->
+  <!-- 2. MAIN KANBAN DASHBOARD -->
   <div id="dashboardSection" class="hidden w-full space-y-4">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-green-900/50 pb-3">
       <div>
         <h1 class="font-brand text-xl sm:text-2xl font-bold text-green-400">SKY TECHNOLOGIES</h1>
-        <p class="text-[11px] sm:text-xs text-cyan-400">Drag & Drop Instant Workflow Management</p>
+        <p class="text-[11px] sm:text-xs text-cyan-400">Smart Drag & Drop Workflow + Integrated Messaging</p>
       </div>
       <div class="flex items-center gap-2 w-full sm:w-auto">
         <button onclick="loadJobs()" class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition active:scale-95">
@@ -87,31 +98,58 @@
       </div>
     </div>
 
-    <!-- Kanban Container -->
+    <!-- Kanban Board Scrollable Columns -->
     <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 pt-2 custom-scroll items-start"></div>
   </div>
 
-  <!-- 3. SIDE QUICK WHATSAPP CHAT DRAWER -->
-  <div id="waModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
-    <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl relative my-auto">
-      <div class="flex justify-between items-center border-b border-gray-700 pb-2.5">
-        <h3 class="font-brand text-green-400 font-bold text-sm sm:text-base">💬 WhatsApp Direct Messaging Box</h3>
-        <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
+  <!-- 3. SLIDE-OVER INTEGRATED CHAT DRAWER (Sidebar Panel) -->
+  <div id="drawerOverlay" onclick="closeDrawer()" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40 transition-opacity"></div>
+  
+  <div id="chatDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-slate-950 border-l border-green-500/40 z-50 p-5 shadow-2xl flex flex-col justify-between translate-x-full drawer-slide">
+    
+    <div class="space-y-4">
+      <!-- Drawer Header -->
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💬</span>
+          <div>
+            <h3 class="font-brand text-green-400 font-bold text-sm" id="drawerJobNo">SKY-TICK-XXXX</h3>
+            <p class="text-[10px] text-cyan-400 uppercase tracking-wider" id="drawerCustomerName">Customer Messaging Hub</p>
+          </div>
+        </div>
+        <button onclick="closeDrawer()" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-lg flex items-center justify-center transition">
+          &times;
+        </button>
       </div>
-      
-      <p class="text-[11px] sm:text-xs text-gray-300">පහත Message එක අවශ්‍ය පරිදි Edit කර ත්‍රිභාෂාවෙන්ම එකවර යවන්න:</p>
 
-      <textarea id="waMessageText" rows="11" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed"></textarea>
+      <!-- Quick Action Bar -->
+      <div class="bg-black/60 border border-green-900/50 rounded-xl p-3 flex justify-between items-center text-xs">
+        <div>
+          <span class="text-gray-400 block text-[10px]">RECIPIENT PHONE:</span>
+          <strong id="drawerPhone" class="text-emerald-400 text-sm font-mono">+94 7X XXX XXXX</strong>
+        </div>
+        <button onclick="copyPhone()" class="bg-slate-800 hover:bg-slate-700 border border-green-500/30 text-green-400 px-3 py-1.5 rounded-lg text-xs transition active:scale-95 flex items-center gap-1">
+          📋 Copy
+        </button>
+      </div>
 
-      <div class="flex flex-col sm:flex-row gap-2">
-        <button onclick="sendWaMessage()" class="w-full sm:flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs sm:text-sm transition active:scale-95">
-          🚀 Open WhatsApp & Send Message
-        </button>
-        <button onclick="closeWaModal()" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-4 py-2.5 rounded-xl text-xs transition">
-          Close Window
-        </button>
+      <!-- Message Editor Box -->
+      <div class="space-y-1">
+        <label class="block text-xs font-semibold text-gray-300">TRILINGUAL MESSAGE TEMPLATE:</label>
+        <textarea id="waMessageText" rows="11" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none leading-relaxed custom-scroll"></textarea>
       </div>
     </div>
+
+    <!-- Action Buttons Footer -->
+    <div class="space-y-2 pt-3 border-t border-gray-800">
+      <button onclick="sendWaMessage()" class="w-full font-brand bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-extrabold py-3.5 rounded-xl shadow-lg transition active:scale-95 text-xs tracking-wider flex items-center justify-center gap-2">
+        🚀 LAUNCH WHATSAPP CHAT
+      </button>
+      <button onclick="copyMessageText()" class="w-full bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1">
+        📋 Copy Message Text Only
+      </button>
+    </div>
+
   </div>
 
   <script>
@@ -195,7 +233,7 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
 
     function loadJobs() {
       const board = document.getElementById('kanbanBoard');
-      board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Fast Loading Kanban Data...</div>';
+      board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Loading Kanban Board...</div>';
 
       fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
         .then(res => res.json())
@@ -246,8 +284,9 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
                   const phone = itemEl.getAttribute('data-phone');
                   const device = itemEl.getAttribute('data-device');
                   const model = itemEl.getAttribute('data-model');
+                  const name = itemEl.getAttribute('data-name');
 
-                  handleDragUpdate(jobNo, newStatus, phone, device, model);
+                  handleDragUpdate(jobNo, newStatus, phone, device, model, name);
                 }
               }
             });
@@ -260,12 +299,12 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
 
     function createCardHTML(job) {
       return `
-        <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}"
+        <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}" data-name="${job.name}"
              class="bg-black/80 border border-gray-800 hover:border-green-500/60 p-3.5 rounded-xl cursor-grab active:cursor-grabbing transition shadow-md hover:shadow-green-900/20 space-y-2">
           
           <div class="flex justify-between items-center border-b border-gray-800/80 pb-1.5">
             <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
-            <button onclick="openCustomChat('${job.jobNo}', '${job.phone}', '${job.device}', '${job.model}')" class="text-[10px] bg-emerald-950 hover:bg-emerald-800 text-emerald-400 border border-emerald-600/40 px-2 py-0.5 rounded transition">
+            <button onclick="openChatDrawer('${job.jobNo}', '${job.phone}', '${job.device}', '${job.model}', '${job.name}', '${job.status || 'New Ticket'}')" class="text-[10px] bg-emerald-950 hover:bg-emerald-800 text-emerald-400 border border-emerald-600/40 px-2 py-0.5 rounded transition active:scale-95">
               💬 Quick Chat
             </button>
           </div>
@@ -279,16 +318,8 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
       `;
     }
 
-    function handleDragUpdate(jobNo, newStatus, phone, device, model) {
-      let template = TRILINGUAL_MESSAGES[newStatus] || 
-`🛠️ *SKY TECHNOLOGIES - Status Update*
-*Ticket No:* ${jobNo}
-*Device:* ${device} (${model})
-*Status:* ${newStatus}`;
-
-      pendingWaPhone = phone.toString().replace(/^0/, '94');
-      document.getElementById('waMessageText').value = template;
-      document.getElementById('waModal').classList.remove('hidden');
+    function handleDragUpdate(jobNo, newStatus, phone, device, model, name) {
+      openChatDrawer(jobNo, phone, device, model, name, newStatus);
 
       const formData = new FormData();
       formData.append('action', 'updateStatus');
@@ -298,20 +329,50 @@ TAM: உங்கள் பழுதுபார்ப்பு முடிந�
       fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
     }
 
-    function openCustomChat(jobNo, phone, device, model) {
+    function openChatDrawer(jobNo, phone, device, model, name, status) {
       pendingWaPhone = phone.toString().replace(/^0/, '94');
-      document.getElementById('waMessageText').value = `Hello! Regarding your repair Ticket ${jobNo} (${device} ${model}):\n\n`;
-      document.getElementById('waModal').classList.remove('hidden');
+      
+      document.getElementById('drawerJobNo').innerText = jobNo;
+      document.getElementById('drawerCustomerName').innerText = name;
+      document.getElementById('drawerPhone').innerText = `+${pendingWaPhone}`;
+
+      let template = TRILINGUAL_MESSAGES[status] || 
+`🛠️ *SKY TECHNOLOGIES - Status Update*
+*Ticket No:* ${jobNo}
+*Device:* ${device} (${model})
+*Status:* ${status}`;
+
+      let formattedMsg = template
+        .replace(/{JOB_NO}/g, jobNo)
+        .replace(/{DEVICE}/g, device)
+        .replace(/{MODEL}/g, model);
+
+      document.getElementById('waMessageText').value = formattedMsg;
+
+      // Show Drawer Animation
+      document.getElementById('drawerOverlay').classList.remove('hidden');
+      document.getElementById('chatDrawer').classList.remove('translate-x-full');
+    }
+
+    function closeDrawer() {
+      document.getElementById('chatDrawer').classList.add('translate-x-full');
+      document.getElementById('drawerOverlay').classList.add('hidden');
     }
 
     function sendWaMessage() {
       const msg = encodeURIComponent(document.getElementById('waMessageText').value);
       window.open(`https://wa.me/${pendingWaPhone}?text=${msg}`, '_blank');
-      closeWaModal();
     }
 
-    function closeWaModal() {
-      document.getElementById('waModal').classList.add('hidden');
+    function copyMessageText() {
+      const txt = document.getElementById('waMessageText').value;
+      navigator.clipboard.writeText(txt);
+      alert('Message text copied!');
+    }
+
+    function copyPhone() {
+      navigator.clipboard.writeText(pendingWaPhone);
+      alert('Phone number copied!');
     }
   </script>
 </body>
