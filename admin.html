@@ -75,8 +75,8 @@
   </main>
 
   <script>
-    // නව Google Apps Script Web App URL එක
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyCMkfvlcdfExqb17F8H8eG753k2qs5ocQNmZkqGRVAuoahln4sSc2k-U0oX6QvMBv-sQ/exec';
+    // නව Google Apps Script Web App URL එක (Template API සඳහා යාවත්කාලීන කරන ලදී)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz66WE5B_MHO1lF_mBXo8oHU_KDa5GWo_Jv5vYoYMMIIjfHu5zbDTbldnb-I_gbFQ9LOA/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
@@ -121,43 +121,19 @@
     }
 
     function sendWhatsAppUpdate(phone, name, ticketId, device, statusSelectId) {
-      const selectedStatus = document.getElementById(statusSelectId).value;
-      let message = "";
-
-      switch(selectedStatus) {
-        case "In Process":
-          message = `SKY TECHNOLOGIES - REPAIR UPDATE\n\nHello ${name},\nYour device *${device}* (${ticketId}) is now *IN PROCESS* for repairs.`;
-          break;
-        case "On Hold":
-          message = `SKY TECHNOLOGIES - ACTION REQUIRED\n\nHello ${name},\nYour repair ticket *${ticketId}* (${device}) is placed *ON HOLD*. Please contact us.`;
-          break;
-        case "Parts Pending":
-          message = `SKY TECHNOLOGIES - PARTS UPDATE\n\nHello ${name},\nYour device *${device}* (*${ticketId}*) is waiting for required spare parts.`;
-          break;
-        case "Ready For Collect":
-          message = `SKY TECHNOLOGIES - READY FOR PICKUP\n\nHello ${name},\nGood news! Your device *${device}* (*${ticketId}*) repair is *COMPLETED & READY FOR PICKUP*.\nVisit: Sky Technologies Kadawatha.`;
-          break;
-        case "Delivered":
-          message = `SKY TECHNOLOGIES - DELIVERED\n\nHello ${name},\nYour device *${device}* (*${ticketId}*) has been delivered. Thank you for choosing us!`;
-          break;
-        default:
-          message = `SKY TECHNOLOGIES - TICKET UPDATE\n\nHello ${name},\nStatus for Ticket *${ticketId}* (${device}) updated to: *${selectedStatus}*.`;
-      }
-
-      // Apps Script හරහා WhatsApp Cloud API එකට ඉල්ලීම යැවීම
+      // Apps Script හරහා WhatsApp Template API එකට ඉල්ලීම යැවීම
       fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ 
           action: 'sendWhatsApp', 
-          phone: phone, 
-          message: message 
+          phone: phone 
         })
       })
       .then(res => res.json())
       .then(data => {
-        console.log("WhatsApp message sent successfully:", data);
-        alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
+        console.log("WhatsApp template message sent successfully:", data);
+        alert("WhatsApp පණිවිඩය (Template) සාර්ථකව යවන ලදී!");
       })
       .catch(err => {
         console.error("Error sending WhatsApp:", err);
