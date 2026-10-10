@@ -2,267 +2,283 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Admin Kanban</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKY TECHNOLOGIES - Helpdesk Kanban Board</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     body {
-      font-family: 'Rajdhani', sans-serif;
-      background: radial-gradient(circle at top, #0b140d 0%, #05080a 50%, #020304 100%);
-      min-height: 100vh;
+      font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
+      background: #090d12;
       color: #e2e8f0;
-      overflow-x: hidden;
+      min-height: 100vh;
     }
     .font-brand { font-family: 'Orbitron', sans-serif; }
-    .sky-card {
-      background: rgba(10, 18, 14, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-      border-radius: 16px;
+    
+    .kanban-col-scroll::-webkit-scrollbar {
+      width: 5px;
     }
-    .sky-input {
-      background: rgba(5, 12, 8, 0.9);
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      color: #38bdf8;
-      border-radius: 10px;
+    .kanban-col-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
     }
-    .kanban-col {
-      min-height: 480px;
-      max-height: calc(100vh - 170px);
+    .kanban-col-scroll::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
     }
-    .ghost-card {
-      opacity: 0.3;
-      background: rgba(34, 197, 94, 0.15) !important;
-      border: 2px dashed #22c55e !important;
+
+    .ticket-card {
+      background: #111822;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease-in-out;
     }
-    .custom-scroll::-webkit-scrollbar { height: 8px; width: 6px; }
-    .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
-    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.4); border-radius: 10px; }
+    .ticket-card:hover {
+      border-color: #22c55e;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .logo-glow {
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
   </style>
 </head>
-<body class="p-3 sm:p-6 min-h-screen flex flex-col justify-between">
+<body class="p-3 sm:p-5 flex flex-col h-screen overflow-hidden">
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="hidden fixed bottom-5 left-5 bg-slate-900 border border-green-500 text-green-400 font-semibold px-4 py-3 rounded-xl z-50 shadow-2xl">
-    <span id="toastMsg">Processing...</span>
-  </div>
-
-  <!-- LOGIN -->
-  <div id="loginSection" class="w-full max-w-md sky-card p-6 text-center space-y-6 my-auto mx-auto">
-    <h1 class="font-brand text-2xl font-extrabold text-white">SKY <span class="text-green-500">TECHNOLOGIES</span></h1>
-    <form onsubmit="checkLogin(event)" class="space-y-4">
-      <input type="password" id="adminPassword" required placeholder="Admin Password" class="w-full sky-input px-4 py-3 text-center text-lg">
-      <button type="submit" class="w-full font-brand bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl transition">
-        LOGIN TO KANBAN
-      </button>
-    </form>
-  </div>
-
-  <!-- KANBAN BOARD -->
-  <div id="dashboardSection" class="hidden w-full space-y-4">
-    <div class="flex justify-between items-center border-b border-green-900/50 pb-3">
-      <h1 class="font-brand text-xl font-bold text-green-400">SKY TECHNOLOGIES ADMIN</h1>
-      <div class="flex gap-2">
-        <button onclick="loadJobs()" class="bg-green-600 text-black font-bold px-4 py-2 rounded-xl text-xs">🔄 Refresh</button>
-        <button onclick="logout()" class="bg-red-950 text-red-300 border border-red-500/50 font-bold px-3 py-2 rounded-xl text-xs">🚪 Logout</button>
+  <!-- Header Section -->
+  <header class="bg-[#111822] border border-gray-800 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-black border border-green-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
+        <img src="logo.png" alt="SKY Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span class="hidden font-brand text-green-400 font-bold text-xs">SKY</span>
       </div>
-    </div>
-
-    <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-6 custom-scroll items-start"></div>
-  </div>
-
-  <!-- WHATSAPP CUSTOMIZER MODAL -->
-  <div id="waModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-900 border border-green-500/50 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-        <h3 class="font-brand text-green-400 font-bold text-sm">💬 Send Meta WhatsApp Notification</h3>
-        <button onclick="closeWaModal()" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
-      </div>
-      
-      <div class="bg-black/60 border border-green-900/50 rounded-xl p-3 text-xs space-y-1">
-        <p><span class="text-gray-400">TICKET:</span> <strong id="modalJobInfo" class="text-emerald-400">SKY-TICK-XXXX</strong></p>
-        <p><span class="text-gray-400">NEW STATUS:</span> <strong id="modalStatus" class="text-cyan-300 uppercase">In Process</strong></p>
-      </div>
-
       <div>
-        <label class="block text-xs font-semibold text-gray-300 mb-1">EDIT MESSAGE TEXT BEFORE SENDING:</label>
-        <textarea id="waMessageText" rows="8" class="w-full sky-input p-3 text-xs font-mono text-cyan-300 focus:outline-none custom-scroll"></textarea>
-      </div>
-
-      <div class="flex gap-2">
-        <button onclick="sendDirectCustomWA()" class="flex-1 font-brand bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-3 rounded-xl text-xs transition">
-          🚀 SEND DIRECT WHATSAPP MESSAGE NOW
-        </button>
-        <button onclick="closeWaModal()" class="bg-gray-800 text-gray-300 font-bold px-4 py-2.5 rounded-xl text-xs">Cancel</button>
+        <h1 class="font-brand text-base sm:text-lg font-bold text-white tracking-wider flex items-center gap-2">
+          SKY <span class="text-green-500">TECHNOLOGIES</span>
+        </h1>
+        <p class="text-[10px] sm:text-xs text-cyan-400 font-semibold tracking-wider">HELPDESK KANBAN BOARD</p>
       </div>
     </div>
-  </div>
+
+    <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 text-black text-xs font-bold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow transition flex items-center gap-2 cursor-pointer">
+      <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
+    </button>
+  </header>
+
+  <!-- Kanban Columns Container -->
+  <main id="kanbanBoard" class="flex-1 flex gap-3 sm:gap-4 overflow-x-auto pb-2 items-start h-full">
+    <div class="w-full text-center py-20 text-gray-500 font-brand">
+      <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
+      <p>LOADING HELPDESK TICKETS...</p>
+    </div>
+  </main>
 
   <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxedfvQOeRCy5in0BzfTISeZql1lgvKfeH4Bdej3K3Uetd6lTmlwZz-ipS2ZPQ8NvNycg/exec";
-    const ADMIN_PASSWORD = "SKY@123";
+    // නව Google Apps Script Web App URL එක
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyCMkfvlcdfExqb17F8H8eG753k2qs5ocQNmZkqGRVAuoahln4sSc2k-U0oX6QvMBv-sQ/exec';
 
-    const STATUS_OPTIONS = [
-      "New Ticket",
-      "On Hold (Not Confirm Customer)",
-      "Confirmed Customer",
-      "In Process",
-      "Parts Ordered",
-      "Parts Pending",
-      "Payment Pending",
-      "Cannot Repair Products",
-      "Ready for Pickup / Delivery",
-      "Out for Delivery",
-      "Delivered to Customer",
-      "Completed / Closed"
+    const columnsBase = [
+      { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
+      { id: "In Process", title: "In Process", color: "border-yellow-500" },
+      { id: "On Hold", title: "On Hold", color: "border-purple-500" },
+      { id: "Parts Pending", title: "Parts Pending", color: "border-orange-500" },
+      { id: "Ready For Collect", title: "Ready For Collect", color: "border-emerald-500" },
+      { id: "Delivered", title: "Delivered", color: "border-gray-600" }
     ];
 
-    let activeJobData = {};
+    let globalTickets = [];
 
-    window.onload = function() {
-      if (sessionStorage.getItem("sky_admin_logged") === "true") showDashboard();
-    };
-
-    function checkLogin(e) {
-      e.preventDefault();
-      if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) {
-        sessionStorage.setItem("sky_admin_logged", "true");
-        showDashboard();
-      } else {
-        alert("Invalid Password!");
+    function formatTicketNumber(val, rowIndex) {
+      if (val && val.toString().trim() !== "") {
+        let cleanVal = val.toString().trim();
+        return cleanVal.startsWith('SKY-TICK-') ? cleanVal : `SKY-TICK-${cleanVal}`;
       }
+      return `SKY-TICK-${1000 + (rowIndex - 1)}`;
     }
 
-    function showDashboard() {
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("dashboardSection").classList.remove("hidden");
-      loadJobs();
+    function updateTicketStatus(rowIndex, newStatus) {
+      const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
+      if (ticket) {
+        ticket.status = newStatus;
+      }
+
+      renderBoard(globalTickets);
+
+      // Apps Script වෙත Status Update එක යැවීම
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ 
+          action: 'updateStatus', 
+          rowIndex: rowIndex, 
+          status: newStatus 
+        })
+      })
+      .then(res => res.json())
+      .then(data => console.log("Status updated successfully:", data))
+      .catch(err => console.error("Error updating status:", err));
     }
 
-    function logout() {
-      sessionStorage.removeItem("sky_admin_logged");
-      document.getElementById("dashboardSection").classList.add("hidden");
-      document.getElementById("loginSection").classList.remove("hidden");
+    function sendWhatsAppUpdate(phone, name, ticketId, device, statusSelectId) {
+      const selectedStatus = document.getElementById(statusSelectId).value;
+      let message = "";
+
+      switch(selectedStatus) {
+        case "In Process":
+          message = `SKY TECHNOLOGIES - REPAIR UPDATE\n\nHello ${name},\nYour device *${device}* (${ticketId}) is now *IN PROCESS* for repairs.`;
+          break;
+        case "On Hold":
+          message = `SKY TECHNOLOGIES - ACTION REQUIRED\n\nHello ${name},\nYour repair ticket *${ticketId}* (${device}) is placed *ON HOLD*. Please contact us.`;
+          break;
+        case "Parts Pending":
+          message = `SKY TECHNOLOGIES - PARTS UPDATE\n\nHello ${name},\nYour device *${device}* (*${ticketId}*) is waiting for required spare parts.`;
+          break;
+        case "Ready For Collect":
+          message = `SKY TECHNOLOGIES - READY FOR PICKUP\n\nHello ${name},\nGood news! Your device *${device}* (*${ticketId}*) repair is *COMPLETED & READY FOR PICKUP*.\nVisit: Sky Technologies Kadawatha.`;
+          break;
+        case "Delivered":
+          message = `SKY TECHNOLOGIES - DELIVERED\n\nHello ${name},\nYour device *${device}* (*${ticketId}*) has been delivered. Thank you for choosing us!`;
+          break;
+        default:
+          message = `SKY TECHNOLOGIES - TICKET UPDATE\n\nHello ${name},\nStatus for Ticket *${ticketId}* (${device}) updated to: *${selectedStatus}*.`;
+      }
+
+      // Apps Script හරහා WhatsApp Cloud API එකට ඉල්ලීම යැවීම
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ 
+          action: 'sendWhatsApp', 
+          phone: phone, 
+          message: message 
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("WhatsApp message sent successfully:", data);
+        alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
+      })
+      .catch(err => {
+        console.error("Error sending WhatsApp:", err);
+        alert("පණිවිඩය යැවීමේදී දෝෂයක් සිදු විය.");
+      });
     }
 
-    function loadJobs() {
+    function renderBoard(data) {
       const board = document.getElementById('kanbanBoard');
-      board.innerHTML = '<div class="text-cyan-400 font-bold animate-pulse text-center w-full py-10">Loading Board Data...</div>';
 
-      fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
-        .then(res => res.json())
-        .then(data => {
-          board.innerHTML = '';
-          STATUS_OPTIONS.forEach(statusTitle => {
-            const colId = `col-${statusTitle.replace(/[^a-zA-Z0-9]/g, '')}`;
-            const filteredJobs = data ? data.filter(j => (j.status || "New Ticket") === statusTitle) : [];
+      if (!data || data.length === 0) {
+        board.innerHTML = `<div class="text-center w-full py-10 text-gray-400">No Tickets Found.</div>`;
+        return;
+      }
 
-            const colDiv = document.createElement('div');
-            colDiv.className = 'sky-card w-80 min-w-[300px] flex flex-col p-3 rounded-2xl flex-shrink-0';
-            colDiv.innerHTML = `
-              <div class="flex justify-between items-center border-b border-green-900/50 pb-2 mb-3">
-                <h3 class="font-brand text-xs font-bold text-green-400 uppercase truncate">${statusTitle}</h3>
-                <span class="bg-green-950 text-green-400 border border-green-600/40 text-[10px] font-bold px-2 py-0.5 rounded-full">${filteredJobs.length}</span>
+      const grouped = {};
+      columnsBase.forEach(col => grouped[col.id] = []);
+
+      data.forEach(item => {
+        const rawStatus = (item.status || "New Ticket").trim();
+        const matchingCol = columnsBase.find(c => c.id.toLowerCase() === rawStatus.toLowerCase());
+        const targetCol = matchingCol ? matchingCol.id : "New Ticket";
+        grouped[targetCol].push(item);
+      });
+
+      let boardHtml = "";
+
+      columnsBase.forEach(col => {
+        const tickets = grouped[col.id] || [];
+        
+        boardHtml += `
+          <div class="w-72 sm:w-80 flex-shrink-0 bg-[#0d131d] border border-gray-800 rounded-xl flex flex-col h-full max-h-full">
+            <div class="p-3 border-b border-gray-800 flex justify-between items-center bg-[#111822] rounded-t-xl">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full ${col.color.replace('border-', 'bg-')}"></span>
+                <h2 class="font-bold text-xs text-gray-200 tracking-wider">${col.title}</h2>
               </div>
-              <div id="${colId}" data-status="${statusTitle}" class="kanban-col space-y-3 overflow-y-auto custom-scroll p-1 flex-1">
-                ${filteredJobs.map(job => createCardHTML(job)).join('')}
+              <span class="text-xs bg-gray-800 text-green-400 px-2 py-0.5 rounded-full font-bold font-mono border border-gray-700">${tickets.length}</span>
+            </div>
+
+            <div class="p-2 flex-1 overflow-y-auto space-y-2.5 kanban-col-scroll">
+        `;
+
+        if (tickets.length === 0) {
+          boardHtml += `<div class="text-center py-8 text-gray-600 text-xs italic">No tickets in this column</div>`;
+        } else {
+          tickets.slice().reverse().forEach((tk) => {
+            const ticketId = formatTicketNumber(tk.ticketNumber, tk.rowIndex);
+            const customer = tk.customerName || "Unknown Customer";
+            const phone = tk.phoneNumber || "";
+            const device = `${tk.deviceType || 'Device'} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`;
+            const selectId = `status-select-${tk.rowIndex}`;
+
+            boardHtml += `
+              <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs">
+                <div>
+                  <div class="flex justify-between items-start gap-2 mb-1">
+                    <span class="font-brand font-extrabold text-green-400 text-xs sm:text-sm tracking-wide">${device}</span>
+                  </div>
+                  <div class="text-gray-400 text-[10px] sm:text-[11px] font-mono">${ticketId}</div>
+                  <div class="text-white font-semibold mt-1 text-xs">${customer}</div>
+                  <div class="text-gray-400 text-[11px] truncate mt-0.5"><i class="fa-solid fa-wrench text-gray-500 mr-1"></i> ${tk.faultDescription || '-'}</div>
+                </div>
+
+                <div class="pt-2 border-t border-gray-800/60 space-y-2">
+                  <div>
+                    <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Process State:</label>
+                    <select id="${selectId}" onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-black/80 border border-green-900/60 text-green-300 text-[11px] rounded p-1 focus:outline-none focus:border-green-500 font-sans cursor-pointer">
+                      ${columnsBase.map(c => `
+                        <option value="${c.id}" ${c.id === col.id ? 'selected' : ''}>
+                          ${c.title}
+                        </option>
+                      `).join('')}
+                    </select>
+                  </div>
+
+                  <div class="flex justify-between items-center gap-2 pt-1">
+                    <span class="text-[10px] text-gray-400 font-mono"><i class="fa-solid fa-phone mr-1"></i>${phone}</span>
+
+                    <button onclick="sendWhatsAppUpdate('${phone}', '${customer.replace(/'/g, "\\'")}', '${ticketId}', '${tk.deviceType}', '${selectId}')" 
+                            class="bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/40 font-bold px-2 py-1 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
+                      <i class="fa-brands fa-whatsapp text-xs"></i> SEND MSG
+                    </button>
+                  </div>
+                </div>
               </div>
             `;
-            board.appendChild(colDiv);
-
-            new Sortable(document.getElementById(colId), {
-              group: 'kanban-workflow',
-              animation: 150,
-              ghostClass: 'ghost-card',
-              onEnd: function (evt) {
-                const itemEl = evt.item;
-                const newStatus = evt.to.getAttribute('data-status');
-                const oldStatus = evt.from.getAttribute('data-status');
-
-                if (newStatus !== oldStatus) {
-                  openCustomizerModal(
-                    itemEl.getAttribute('data-jobno'),
-                    newStatus,
-                    itemEl.getAttribute('data-phone'),
-                    itemEl.getAttribute('data-device'),
-                    itemEl.getAttribute('data-model'),
-                    itemEl.getAttribute('data-name')
-                  );
-                }
-              }
-            });
           });
+        }
+
+        boardHtml += `
+            </div>
+          </div>
+        `;
+      });
+
+      board.innerHTML = boardHtml;
+    }
+
+    function fetchTickets() {
+      const board = document.getElementById('kanbanBoard');
+
+      board.innerHTML = `
+        <div class="w-full text-center py-20 text-gray-500 font-brand">
+          <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
+          <p>FETCHING LATEST HELPDESK TICKETS...</p>
+        </div>`;
+
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          globalTickets = data;
+          renderBoard(globalTickets);
+        })
+        .catch(err => {
+          console.error(err);
+          board.innerHTML = `<div class="text-center w-full py-10 text-red-400">Failed to load tickets. Please check Web App URL.</div>`;
         });
     }
 
-    function createCardHTML(job) {
-      return `
-        <div data-jobno="${job.jobNo}" data-phone="${job.phone}" data-device="${job.device}" data-model="${job.model}" data-name="${job.name}"
-             class="bg-black/80 border border-gray-800 hover:border-green-500/60 p-3.5 rounded-xl cursor-grab transition space-y-2">
-          <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
-            <span class="font-brand text-cyan-400 font-bold text-xs">${job.jobNo}</span>
-            <button onclick="openCustomizerModal('${job.jobNo}', '${job.status || 'New Ticket'}', '${job.phone}', '${job.device}', '${job.model}', '${job.name}')" 
-                    class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-600/40 px-2 py-0.5 rounded">✍️ Edit Msg</button>
-          </div>
-          <div class="text-xs space-y-1">
-            <p class="font-semibold text-white">${job.name}</p>
-            <p class="text-emerald-400 font-medium">${job.device} <span class="text-gray-400 text-[10px]">(${job.model})</span></p>
-            <p class="text-gray-400 text-[11px] line-clamp-2">${job.fault}</p>
-          </div>
-        </div>
-      `;
-    }
-
-    function openCustomizerModal(jobNo, newStatus, phone, device, model, name) {
-      activeJobData = { jobNo, newStatus, phone, device, model, name };
-
-      document.getElementById('modalJobInfo').innerText = `${jobNo} (${device} ${model})`;
-      document.getElementById('modalStatus').innerText = newStatus;
-
-      let msgTemplate = `🛠️ *SKY TECHNOLOGIES - Repair Update*
-*Ticket No:* ${jobNo}
-*Device:* ${device} (${model})
-*Status:* ${newStatus}
-
-ENG: Your repair status has been updated to "${newStatus}".
-SIN: ඔබගේ උපකරණයේ තත්වය "${newStatus}" ලෙස වෙනස් වී ඇත.`;
-
-      document.getElementById('waMessageText').value = msgTemplate;
-      document.getElementById('waModal').classList.remove('hidden');
-    }
-
-    function closeWaModal() {
-      document.getElementById('waModal').classList.add('hidden');
-    }
-
-    function sendDirectCustomWA() {
-      const customMsg = document.getElementById('waMessageText').value;
-      closeWaModal();
-      showToast(`🔄 Updating Status & Dispatching Meta WhatsApp...`);
-
-      const formData = new FormData();
-      formData.append('action', 'updateStatusAndSendWA');
-      formData.append('jobNo', activeJobData.jobNo);
-      formData.append('status', activeJobData.newStatus);
-      formData.append('phone', activeJobData.phone);
-      formData.append('message', customMsg);
-
-      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-          showToast(`✅ Status Updated & WhatsApp Delivered!`);
-        })
-        .catch(err => showToast(`❌ Error sending message.`));
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').innerText = msg;
-      toast.classList.remove('hidden');
-      setTimeout(() => { toast.classList.add('hidden'); }, 3500);
-    }
+    window.addEventListener('DOMContentLoaded', fetchTickets);
   </script>
 </body>
 </html>
