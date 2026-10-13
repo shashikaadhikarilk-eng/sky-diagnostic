@@ -75,7 +75,7 @@
   </main>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyITirx2Fxwy4oIwtQhhD-e3xBNNoar-gx8T0b9Ik20-QVoL59LZ4Kk-YHqpIOwb-YlXQ/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwd0BeyFCZuYPy1qG01odaHW-cGd30LHud5apM2cf9OOVUm3t3NJPQOUoZGYwSndoM7qg/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
@@ -122,23 +122,27 @@
       const messageBox = document.getElementById(msgInputId);
       const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
 
-      fetch(scriptURL, {
+      // Node-RED Webhook URL එක මෙතැනට ලබා දී ඇත
+      const nodeRedWebhookUrl = 'https://YOUR-NODERED-DOMAIN.com/kanban-whatsapp';
+
+      fetch(nodeRedWebhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({ 
-          action: 'sendWhatsApp', 
           phone: phone,
           message: customMessage 
         })
       })
       .then(res => res.json())
       .then(data => {
-        console.log("WhatsApp message sent successfully:", data);
+        console.log("Node-RED හරහා පණිවිඩය යැවීම සාර්ථකයි:", data);
         alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
       })
       .catch(err => {
-        console.error("Error sending WhatsApp:", err);
-        alert("පණිවිඩය යැවීමේදී දෝෂයක් සිදු විය.");
+        console.error("දෝෂයක් සිදු විය:", err);
+        alert("Node-RED වෙත සම්බන්ධ වීමේදී දෝෂයක් ඇති විය.");
       });
     }
 
@@ -246,7 +250,7 @@
       board.innerHTML = `
         <div class="w-full text-center py-20 text-gray-500 font-brand">
           <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
-          <p>FETCHING LATEST HELPDESK TICKETS...</p>
+          <p>FETCHING HELPDESK TICKETS...</p>
         </div>`;
 
       fetch(scriptURL)
