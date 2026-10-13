@@ -75,8 +75,7 @@
   </main>
 
   <script>
-    // නව Google Apps Script Web App URL එක (Template API සඳහා යාවත්කාලීන කරන ලදී)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbz66WE5B_MHO1lF_mBXo8oHU_KDa5GWo_Jv5vYoYMMIIjfHu5zbDTbldnb-I_gbFQ9LOA/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyITirx2Fxwy4oIwtQhhD-e3xBNNoar-gx8T0b9Ik20-QVoL59LZ4Kk-YHqpIOwb-YlXQ/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
@@ -105,7 +104,6 @@
 
       renderBoard(globalTickets);
 
-      // Apps Script වෙත Status Update එක යැවීම
       fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -120,20 +118,23 @@
       .catch(err => console.error("Error updating status:", err));
     }
 
-    function sendWhatsAppUpdate(phone, name, ticketId, device, statusSelectId) {
-      // Apps Script හරහා WhatsApp Template API එකට ඉල්ලීම යැවීම
+    function sendWhatsAppUpdate(phone, msgInputId) {
+      const messageBox = document.getElementById(msgInputId);
+      const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
+
       fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ 
           action: 'sendWhatsApp', 
-          phone: phone 
+          phone: phone,
+          message: customMessage 
         })
       })
       .then(res => res.json())
       .then(data => {
-        console.log("WhatsApp template message sent successfully:", data);
-        alert("WhatsApp පණිවිඩය (Template) සාර්ථකව යවන ලදී!");
+        console.log("WhatsApp message sent successfully:", data);
+        alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
       })
       .catch(err => {
         console.error("Error sending WhatsApp:", err);
@@ -186,6 +187,7 @@
             const phone = tk.phoneNumber || "";
             const device = `${tk.deviceType || 'Device'} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`;
             const selectId = `status-select-${tk.rowIndex}`;
+            const msgInputId = `msg-input-${tk.rowIndex}`;
 
             boardHtml += `
               <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs">
@@ -210,11 +212,16 @@
                     </select>
                   </div>
 
+                  <div>
+                    <label class="text-[9px] text-gray-400 font-bold uppercase tracking-wider block mb-1">WhatsApp Message (සිංහල / English / தமிழ்):</label>
+                    <textarea id="${msgInputId}" class="w-full bg-black/90 border border-gray-700 text-gray-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-green-500" rows="2">ආයුබෝවන් ${customer}, ඔබගේ ${device} අලුත්වැඩියා කටයුතු දැන් (${col.title}) තත්වයේ පවතී. - SKY TECHNOLOGIES</textarea>
+                  </div>
+
                   <div class="flex justify-between items-center gap-2 pt-1">
                     <span class="text-[10px] text-gray-400 font-mono"><i class="fa-solid fa-phone mr-1"></i>${phone}</span>
 
-                    <button onclick="sendWhatsAppUpdate('${phone}', '${customer.replace(/'/g, "\\'")}', '${ticketId}', '${tk.deviceType}', '${selectId}')" 
-                            class="bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/40 font-bold px-2 py-1 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
+                    <button onclick="sendWhatsAppUpdate('${phone}', '${msgInputId}')" 
+                            class="bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/40 font-bold px-2.5 py-1.5 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
                       <i class="fa-brands fa-whatsapp text-xs"></i> SEND MSG
                     </button>
                   </div>
