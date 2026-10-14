@@ -122,8 +122,8 @@
       const messageBox = document.getElementById(msgInputId);
       const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
 
-      // Node-RED Webhook URL එක මෙතැනට ලබා දී ඇත
-      const nodeRedWebhookUrl = 'https://YOUR-NODERED-DOMAIN.com/kanban-whatsapp';
+      // Ngrok Webhook URL එක සෘජුවම මෙහි ඇතුළත් කර ඇත
+      const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
 
       fetch(nodeRedWebhookUrl, {
         method: 'POST',
