@@ -1,8 +1,15 @@
+/**
+ * ටිකට් දත්ත Google Sheet වෙත සහ Node-RED (WhatsApp) වෙත යැවීම
+ * @param {string} ticketId - ටිකට් අංකය
+ * @param {string} customerPhone - පාරිභෝගිකයාගේ දුරකථන අංකය
+ * @param {string} messageText - යැවිය යුතු පණිවිඩය
+ * @param {string} newState - ටිකට් එකේ නව තත්ත්වය (Status)
+ */
 async function sendTicketData(ticketId, customerPhone, messageText, newState) {
-    // 1. ඔබ ලබාදුන් Google Apps Script URL එක
+    // 1. Google Apps Script Web App URL එක
     const googleScriptUrl = 'https://script.google.com/macros/s/AKfycbynIioz2bDhR1Y02r9LbhUCEz8S23G4dJf50HUhY20Wyj5EAbMzSAk3pqJmPD2NopIJrQ/exec';
     
-    // 2. ඔබේ දුරකථනයේ ලෝකල් IP එක (උදා: 192.168.8.xxx) සහ Node-RED Port එක
+    // 2. Node-RED ලෝකල් IP ලිපිනය සහ පෝට් එක
     const nodeRedUrl = 'http://192.168.8.100:1880/kanban-whatsapp'; 
 
     const payload = {
@@ -13,13 +20,13 @@ async function sendTicketData(ticketId, customerPhone, messageText, newState) {
     };
 
     try {
-        // Google Sheet එකට දත්ත යැවීම (Background එකේ සිදුවේ)
+        // Google Sheet වෙත පසුබිමෙන් (Background) දත්ත යැවීම
         fetch(googleScriptUrl, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
-        });
+        }).catch(err => console.warn('Google Sheet Sync Warning:', err));
 
         // Node-RED හරහා WhatsApp පණිවිඩය යැවීම
         let response = await fetch(nodeRedUrl, {
@@ -31,9 +38,12 @@ async function sendTicketData(ticketId, customerPhone, messageText, newState) {
         if (response.ok) {
             console.log('ටිකට් දත්ත Google Sheet එකට සහ WhatsApp වෙත සාර්ථකව යවන ලදී!');
             alert('කාර්යය සාර්ථකයි!');
+        } else {
+            throw new Error('Node-RED වෙතින් දෝෂ සහිත ප්‍රතිචාරයක් ලැබුණි.');
         }
+
     } catch (error) {
         console.error('දෝෂයක් ඇති විය:', error);
-        alert('පද්ධතිය සම්බන්ධ කිරීමේදී දෝෂයක් ඇති විය.');
+        alert('පද්ධතිය සම්බන්ධ කිරීමේදී දෝෂයක් ඇති විය. දත්ත නිරීක්ෂණය කරන්න.');
     }
 }
