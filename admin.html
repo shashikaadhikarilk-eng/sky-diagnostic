@@ -122,7 +122,8 @@
       const messageBox = document.getElementById(msgInputId);
       const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
 
-      const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
+      // ඔබගේ දුරකථනයේ (Termux) ලෝකල් IP ලිපිනය මෙහි යොදා ඇත
+      const nodeRedWebhookUrl = 'http://192.168.8.100:1880/kanban-whatsapp';
 
       fetch(nodeRedWebhookUrl, {
         method: 'POST',
