@@ -46,6 +46,7 @@
 </head>
 <body class="p-3 sm:p-5 flex flex-col h-screen overflow-hidden">
 
+  <!-- Header Section -->
   <header class="bg-[#111822] border border-gray-800 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-full bg-black border border-green-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
@@ -65,6 +66,7 @@
     </button>
   </header>
 
+  <!-- Kanban Columns Container -->
   <main id="kanbanBoard" class="flex-1 flex gap-3 sm:gap-4 overflow-x-auto pb-2 items-start h-full">
     <div class="w-full text-center py-20 text-gray-500 font-brand">
       <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
@@ -73,8 +75,8 @@
   </main>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwd0BeyFCZuYPy1qG01odaHW-cGd30LHud5apM2cf9OOVUm3t3NJPQOUoZGYwSndoM7qg/exec';
-    const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
+    // නව Google Apps Script Web App URL එක මෙහි සටහන් කර ඇත
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbycPZq8r_uJEOxE3vaMlbWjj0sOFQeXTuw6tLqnvGN1HvIZfC-dvHBzMU_AUJYqESoM/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "border-blue-500" },
@@ -97,16 +99,23 @@
 
     function updateTicketStatus(rowIndex, newStatus) {
       const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
-      if (ticket) ticket.status = newStatus;
+      if (ticket) {
+        ticket.status = newStatus;
+      }
 
       renderBoard(globalTickets);
 
       fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'updateStatus', rowIndex: rowIndex, status: newStatus })
+        body: JSON.stringify({ 
+          action: 'updateStatus', 
+          rowIndex: rowIndex, 
+          status: newStatus 
+        })
       })
       .then(res => res.json())
+      .then(data => console.log("Status updated successfully:", data))
       .catch(err => console.error("Error updating status:", err));
     }
 
@@ -114,18 +123,25 @@
       const messageBox = document.getElementById(msgInputId);
       const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
 
+      const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
+
       fetch(nodeRedWebhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone, message: customMessage })
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ 
+          phone: phone,
+          message: customMessage 
+        })
       })
       .then(res => res.json())
       .then(data => {
-        console.log("Success:", data);
+        console.log("Node-RED හරහා පණිවිඩය යැවීම සාර්ථකයි:", data);
         alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
       })
       .catch(err => {
-        console.error("Error:", err);
+        console.error("දෝෂයක් සිදු විය:", err);
         alert("Node-RED වෙත සම්බන්ධ වීමේදී දෝෂයක් ඇති විය.");
       });
     }
@@ -219,7 +235,10 @@
           });
         }
 
-        boardHtml += `</div></div>`;
+        boardHtml += `
+            </div>
+          </div>
+        `;
       });
 
       board.innerHTML = boardHtml;
@@ -227,6 +246,7 @@
 
     function fetchTickets() {
       const board = document.getElementById('kanbanBoard');
+
       board.innerHTML = `
         <div class="w-full text-center py-20 text-gray-500 font-brand">
           <i class="fa-solid fa-spinner fa-spin text-3xl text-green-500 mb-3"></i>
