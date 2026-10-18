@@ -1,200 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SKY TECHNOLOGIES - Diagnostic & Tracking</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Rajdhani', sans-serif;
-      background: radial-gradient(circle at top, #0b140d 0%, #05080a 50%, #020304 100%);
-      min-height: 100vh;
-      color: #e2e8f0;
-    }
-    .font-brand { font-family: 'Orbitron', sans-serif; }
-    .sky-glass-card {
-      background: rgba(10, 18, 14, 0.75);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
-      border-radius: 16px;
-    }
-    .sky-input {
-      background: rgba(5, 12, 8, 0.85);
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      color: #38bdf8;
-      border-radius: 10px;
-    }
-    .sky-input:focus {
-      outline: none;
-      border-color: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Technology - Job Ticket Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
-<body class="py-4 px-3 sm:py-10 sm:px-6">
+<body>
 
-  <div class="max-w-2xl mx-auto space-y-4 sm:space-y-6 relative z-10">
-    
-    <!-- Header -->
-    <div class="sky-glass-card p-4 sm:p-6 text-center space-y-2">
-      <h1 class="font-brand text-2xl sm:text-3xl font-extrabold text-white">
-        SKY <span class="text-green-500">TECHNOLOGIES</span>
-      </h1>
-      <p class="text-xs text-cyan-400 font-semibold uppercase tracking-wider">Repair & Diagnostic Portal</p>
-      
-      <div class="flex border-b border-green-900/40 mt-4 text-xs sm:text-sm font-bold">
-        <button id="tabFormBtn" onclick="switchTab('form')" class="flex-1 py-2.5 text-center text-green-400 border-b-2 border-green-500">
-          📝 Submit Request
-        </button>
-        <button id="tabTrackBtn" onclick="switchTab('track')" class="flex-1 py-2.5 text-center text-gray-400 border-b-2 border-transparent hover:text-cyan-400">
-          🔍 Check Live Status
-        </button>
-      </div>
-    </div>
+<div class="container">
+    <h2>Sky Technology - Diagnostic Job Form</h2>
+    <form id="jobForm">
+        <div class="form-group">
+            <label for="customerName">Customer Name</label>
+            <input type="text" id="customerName" name="customerName" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="07XXXXXXXX" required>
+        </div>
+        <div class="form-group">
+            <label for="deviceType">Device Type</label>
+            <select id="deviceType" name="deviceType" required>
+                <option value="">Select Device Type</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Desktop PC">Desktop PC</option>
+                <option value="Motherboard">Motherboard</option>
+                <option value="VGA / Graphics Card">VGA / Graphics Card</option>
+                <option value="Monitor">Monitor</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="deviceModel">Device Model</label>
+            <input type="text" id="deviceModel" name="deviceModel" required>
+        </div>
+        <div class="form-group">
+            <label for="serialNumber">Serial Number</label>
+            <input type="text" id="serialNumber" name="serialNumber" required>
+        </div>
+        <div class="form-group">
+            <label for="faultDescription">Fault Description</label>
+            <textarea id="faultDescription" name="faultDescription" rows="4" required></textarea>
+        </div>
+        <button type="submit" id="submitBtn">SUBMIT FORM</button>
+    </form>
+</div>
 
-    <!-- 1. FORM TAB -->
-    <div id="formTab">
-      <form id="skyForm" onsubmit="submitToGoogleSheet(event)" class="space-y-3 sm:space-y-4">
+<script>
+    // නව Google Apps Script Web App URL එක මෙහි සටහන් කර ඇත
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbycPZq8r_uJEOxE3vaMlbWjj0sOFQeXTuw6tLqnvGN1HvIZfC-dvHBzMU_AUJYqESoM/exec';
+    const myWhatsAppNumber = '94764117935';
+
+    document.getElementById('jobForm').addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        <div class="sky-glass-card p-4">
-          <label class="block mb-1 text-white font-bold text-sm">Customer Name *</label>
-          <input type="text" name="customer_name" required placeholder="John Doe" class="w-full sky-input px-3.5 py-2.5 text-sm">
-        </div>
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Submitting...';
 
-        <div class="sky-glass-card p-4">
-          <label class="block mb-1 text-white font-bold text-sm">Phone Number *</label>
-          <input type="tel" name="phone_number" required placeholder="07X XXXXXXX" class="w-full sky-input px-3.5 py-2.5 text-sm">
-        </div>
+        const formData = {
+            customerName: document.getElementById('customerName').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+            deviceType: document.getElementById('deviceType').value,
+            deviceModel: document.getElementById('deviceModel').value,
+            serialNumber: document.getElementById('serialNumber').value,
+            faultDescription: document.getElementById('faultDescription').value
+        };
 
-        <div class="sky-glass-card p-4">
-          <label class="block mb-1 text-white font-bold text-sm">Device Type *</label>
-          <select name="device_type" required class="w-full sky-input px-3.5 py-2.5 text-sm bg-black">
-            <option value="Laptop">Laptop / ලැප්ටොප්</option>
-            <option value="Motherboard">Motherboard / මවුපුවරුව</option>
-            <option value="Graphic Card">Graphic Card (GPU)</option>
-            <option value="Desktop PC">Desktop PC</option>
-          </select>
-        </div>
-
-        <div class="sky-glass-card p-4">
-          <label class="block mb-1 text-white font-bold text-sm">Device Model *</label>
-          <input type="text" name="device_model" required placeholder="ASUS ROG / RTX 3060" class="w-full sky-input px-3.5 py-2.5 text-sm">
-        </div>
-
-        <div class="sky-glass-card p-4">
-          <label class="block mb-1 text-white font-bold text-sm">Serial Number (S/N) *</label>
-          <input type="text" name="serial_number" required placeholder="S/N Number" class="w-full sky-input px-3.5 py-2.5 text-sm">
-        </div>
-
-        <div class="sky-glass-card p-4">
-          <label class="block mb-1 text-white font-bold text-sm">Fault Description *</label>
-          <textarea name="fault_description" required rows="3" placeholder="Describe the issue..." class="w-full sky-input px-3.5 py-2.5 text-sm"></textarea>
-        </div>
-
-        <button type="submit" id="submitBtn" class="w-full font-brand bg-gradient-to-r from-green-500 to-emerald-600 text-black font-extrabold py-3.5 rounded-xl shadow-lg active:scale-95 transition text-sm">
-          SUBMIT FORM
-        </button>
-      </form>
-    </div>
-
-    <!-- 2. TRACK TAB -->
-    <div id="trackTab" class="hidden sky-glass-card p-4 sm:p-6 space-y-4">
-      <h2 class="font-brand text-base font-bold text-green-400">Check Repair Status</h2>
-      <div class="flex gap-2">
-        <input type="text" id="searchJobNo" placeholder="SKY-TICK-XXXX" class="sky-input flex-1 px-3.5 py-2.5 text-sm uppercase">
-        <button onclick="checkStatus()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">
-          SEARCH
-        </button>
-      </div>
-
-      <div id="statusResult" class="hidden bg-black/80 border border-green-800/60 p-4 rounded-xl space-y-2">
-        <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-          <span class="font-brand text-cyan-400 font-bold text-sm" id="resTicketNo"></span>
-          <span class="px-2.5 py-1 bg-green-950 border border-green-500 text-green-400 font-bold text-xs rounded-full" id="resStatus"></span>
-        </div>
-        <div class="text-xs space-y-1 text-gray-300">
-          <p><strong>Customer:</strong> <span id="resName"></span></p>
-          <p><strong>Device:</strong> <span id="resDevice"></span> (<span id="resModel"></span>)</p>
-          <p><strong>Fault:</strong> <span id="resFault"></span></p>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwd0BeyFCZuYPy1qG01odaHW-cGd30LHud5apM2cf9OOVUm3t3NJPQOUoZGYwSndoM7qg/exec";
-
-    function switchTab(tab) {
-      if(tab === 'form') {
-        document.getElementById('formTab').classList.remove('hidden');
-        document.getElementById('trackTab').classList.add('hidden');
-        document.getElementById('tabFormBtn').className = "flex-1 py-2.5 text-center text-green-400 border-b-2 border-green-500";
-        document.getElementById('tabTrackBtn').className = "flex-1 py-2.5 text-center text-gray-400 border-b-2 border-transparent hover:text-cyan-400";
-      } else {
-        document.getElementById('formTab').classList.add('hidden');
-        document.getElementById('trackTab').classList.remove('hidden');
-        document.getElementById('tabTrackBtn').className = "flex-1 py-2.5 text-center text-cyan-400 border-b-2 border-cyan-500";
-        document.getElementById('tabFormBtn').className = "flex-1 py-2.5 text-center text-gray-400 border-b-2 border-transparent hover:text-green-400";
-      }
-    }
-
-    function submitToGoogleSheet(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = 'SUBMITTING...';
-      btn.disabled = true;
-
-      const form = document.getElementById('skyForm');
-      const formData = new FormData(form);
-
-      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
+        fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify(formData)
+        })
         .then(response => response.json())
         .then(data => {
-          if (data.result === 'success') {
-            alert(`🎉 Success! Your Ticket Number is: ${data.jobNumber}`);
-            form.reset();
-          } else {
-            alert('Error: ' + data.message);
-          }
-          btn.innerText = 'SUBMIT FORM';
-          btn.disabled = false;
+            if (data.result === 'success') {
+                const ticketNum = data.ticketNumber;
+                alert("Success! Your Ticket Number is: " + ticketNum);
+
+                const message = encodeURIComponent(`Hello Sky Technology, I have submitted a job form.\n\nTicket Number: ${ticketNum}\nName: ${formData.customerName}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nFault: ${formData.faultDescription}`);
+                window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
+            } else {
+                alert("Error submitting form: " + (data.error || "Unknown error"));
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'SUBMIT FORM';
+            }
         })
         .catch(error => {
-          alert('Submission Failed!');
-          btn.innerText = 'SUBMIT FORM';
-          btn.disabled = false;
+            console.error('Error!', error.message);
+            alert("Something went wrong. Please try again.");
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'SUBMIT FORM';
         });
-    }
+    });
+</script>
 
-    function checkStatus() {
-      const query = document.getElementById('searchJobNo').value.trim().toUpperCase();
-      if(!query) return alert('Enter Ticket Number!');
-
-      fetch(`${GOOGLE_SCRIPT_URL}?action=getJobs`)
-        .then(res => res.json())
-        .then(data => {
-          const match = data.find(j => j.jobNo && j.jobNo.toUpperCase() === query);
-          const resCard = document.getElementById('statusResult');
-          
-          if(match) {
-            document.getElementById('resTicketNo').innerText = match.jobNo;
-            document.getElementById('resStatus').innerText = match.status || 'New Ticket';
-            document.getElementById('resName').innerText = match.name;
-            document.getElementById('resDevice').innerText = match.device;
-            document.getElementById('resModel').innerText = match.model;
-            document.getElementById('resFault').innerText = match.fault;
-            resCard.classList.remove('hidden');
-          } else {
-            alert('Ticket Number not found!');
-            resCard.classList.add('hidden');
-          }
-        });
-    }
-  </script>
 </body>
 </html>
