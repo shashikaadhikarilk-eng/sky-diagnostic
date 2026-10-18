@@ -5,52 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sky Technology - Job Ticket Form</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 500px;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin: auto;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 500px; background: white; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: auto; }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
@@ -58,17 +20,10 @@
 <div class="container">
     <h2>Sky Technology - Diagnostic Job Form</h2>
     <form id="jobForm">
-        <div class="form-group">
-            <label for="customerName">Customer Name</label>
-            <input type="text" id="customerName" name="customerName" required>
-        </div>
-        <div class="form-group">
-            <label for="phoneNumber">Phone Number</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="07XXXXXXXX" required>
-        </div>
-        <div class="form-group">
-            <label for="deviceType">Device Type</label>
-            <select id="deviceType" name="deviceType" required>
+        <div class="form-group"><label>Customer Name</label><input type="text" id="customerName" required></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" id="phoneNumber" placeholder="07XXXXXXXX" required></div>
+        <div class="form-group"><label>Device Type</label>
+            <select id="deviceType" required>
                 <option value="">Select Device Type</option>
                 <option value="Laptop">Laptop</option>
                 <option value="Desktop PC">Desktop PC</option>
@@ -78,30 +33,20 @@
                 <option value="Other">Other</option>
             </select>
         </div>
-        <div class="form-group">
-            <label for="deviceModel">Device Model</label>
-            <input type="text" id="deviceModel" name="deviceModel" required>
-        </div>
-        <div class="form-group">
-            <label for="serialNumber">Serial Number</label>
-            <input type="text" id="serialNumber" name="serialNumber" required>
-        </div>
-        <div class="form-group">
-            <label for="faultDescription">Fault Description</label>
-            <textarea id="faultDescription" name="faultDescription" rows="4" required></textarea>
-        </div>
+        <div class="form-group"><label>Device Model</label><input type="text" id="deviceModel" required></div>
+        <div class="form-group"><label>Serial Number</label><input type="text" id="serialNumber" required></div>
+        <div class="form-group"><label>Fault Description</label><textarea id="faultDescription" rows="4" required></textarea></div>
         <button type="submit" id="submitBtn">SUBMIT FORM</button>
     </form>
 </div>
 
 <script>
-    // නව Google Apps Script Web App URL එක මෙහි සටහන් කර ඇත
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbycPZq8r_uJEOxE3vaMlbWjj0sOFQeXTuw6tLqnvGN1HvIZfC-dvHBzMU_AUJYqESoM/exec';
+    // නව Google Apps Script Web App URL එක
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxDt4gW4SA7bvfT399hUvhHJlfPfgagv6YjHF188jhSCRziyZRvTy4qynntbWGBfgs/exec';
     const myWhatsAppNumber = '94764117935';
 
     document.getElementById('jobForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
         submitBtn.innerText = 'Submitting...';
@@ -117,30 +62,115 @@
 
         fetch(scriptURL, {
             method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result === 'success') {
-                const ticketNum = data.ticketNumber;
-                alert("Success! Your Ticket Number is: " + ticketNum);
-
-                const message = encodeURIComponent(`Hello Sky Technology, I have submitted a job form.\n\nTicket Number: ${ticketNum}\nName: ${formData.customerName}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nFault: ${formData.faultDescription}`);
-                window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
-            } else {
-                alert("Error submitting form: " + (data.error || "Unknown error"));
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'SUBMIT FORM';
-            }
+        .then(() => {
+            alert("Form submitted successfully!");
+            const message = encodeURIComponent(`Hello Sky Technology, I have submitted a job form.\n\nName: ${formData.customerName}\nDevice: ${formData.deviceType} (${formData.deviceModel})\nFault: ${formData.faultDescription}`);
+            window.location.href = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
         })
         .catch(error => {
-            console.error('Error!', error.message);
+            console.error('Error!', error);
             alert("Something went wrong. Please try again.");
             submitBtn.disabled = false;
             submitBtn.innerText = 'SUBMIT FORM';
         });
     });
 </script>
-
 </body>
 </html>
+```[cite: 2]
+
+---
+
+### 2. `admin.html` (Kanban Board)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKY TECHNOLOGIES - Helpdesk Kanban Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Rajdhani', sans-serif; background: #090d12; color: #e2e8f0; min-height: 100vh; }
+    .font-brand { font-family: 'Orbitron', sans-serif; }
+    .ticket-card { background: #111822; border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="p-4 flex flex-col h-screen overflow-hidden">
+  <header class="bg-[#111822] border border-gray-800 rounded-xl p-4 mb-4 flex justify-between items-center">
+    <h1 class="font-brand text-lg font-bold text-white">SKY <span class="text-green-500">TECHNOLOGIES</span> KANBAN</h1>
+    <button onclick="fetchTickets()" class="bg-green-500 text-black text-xs font-bold px-4 py-2 rounded-lg"><i class="fa-solid fa-rotate-right"></i> REFRESH</button>
+  </header>
+
+  <main id="kanbanBoard" class="flex-1 flex gap-4 overflow-x-auto pb-2 items-start">
+    <div class="w-full text-center py-20 text-gray-500 font-brand">LOADING TICKETS...</div>
+  </main>
+
+  <script>
+    // නව Google Apps Script Web App URL එක
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxDt4gW4SA7bvfT399hUvhHJlfPfgagv6YjHF188jhSCRziyZRvTy4qynntbWGBfgs/exec';
+    const columnsBase = ["New Ticket", "In Process", "On Hold", "Parts Pending", "Ready For Collect", "Delivered"];
+    let globalTickets = [];
+
+    function updateTicketStatus(rowIndex, newStatus) {
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateStatus', rowIndex: rowIndex, status: newStatus })
+      }).then(() => fetchTickets());
+    }
+
+    function sendWhatsAppUpdate(phone, msgId) {
+      const msg = document.getElementById(msgId).value;
+      fetch('https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone, message: msg })
+      }).then(() => alert("Message Sent!")).catch(() => alert("Node-RED error."));
+    }
+
+    function renderBoard(data) {
+      const board = document.getElementById('kanbanBoard');
+      if (!data || data.length === 0) { board.innerHTML = `<div class="text-center w-full py-10 text-gray-400">No Tickets Found.</div>`; return; }
+
+      let html = "";
+      columnsBase.forEach(col => {
+        const filtered = data.filter(t => (t.status || "New Ticket").trim().toLowerCase() === col.toLowerCase());
+        html += `<div class="w-80 flex-shrink-0 bg-[#0d131d] border border-gray-800 rounded-xl flex flex-col h-full"><div class="p-3 border-b border-gray-800 font-bold text-xs text-green-400">${col} (${filtered.length})</div><div class="p-2 flex-1 overflow-y-auto space-y-2">`;
+        
+        filtered.forEach(tk => {
+          html += `<div class="ticket-card p-3 rounded-lg text-xs space-y-2">
+            <div class="font-bold text-green-400">${tk.deviceType} - ${tk.deviceModel}</div>
+            <div class="text-gray-400">${tk.ticketNumber} | ${tk.customerName}</div>
+            <div><select onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-black text-white p-1 rounded border border-gray-700">
+              ${columnsBase.map(c => `<option value="${c}" ${c === col ? 'selected' : ''}>${c}</option>`).join('')}
+            </select></div>
+            <textarea id="msg-${tk.rowIndex}" class="w-full bg-black text-white p-1 rounded border border-gray-700" rows="2">Hello ${tk.customerName}, your repair status is: ${col}</textarea>
+            <div class="flex justify-between items-center"><span class="text-gray-400">${tk.phoneNumber}</span><button onclick="sendWhatsAppUpdate('${tk.phoneNumber}', 'msg-${tk.rowIndex}')" class="bg-green-600 text-white px-2 py-1 rounded font-bold">SEND MSG</button></div>
+          </div>`;
+        });
+        html += `</div></div>`;
+      });
+      board.innerHTML = html;
+    }
+
+    function fetchTickets() {
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => { globalTickets = data; renderBoard(globalTickets); })
+        .catch(err => console.error(err));
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchTickets);
+  </script>
+</body>
+</html>
+```[cite: 1]
