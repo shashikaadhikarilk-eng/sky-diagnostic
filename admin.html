@@ -31,6 +31,11 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: grab;
+    }
+    .ticket-card:active {
+      cursor: grabbing;
+      opacity: 0.6;
     }
     .ticket-card:hover {
       border-color: rgba(34, 197, 94, 0.6);
@@ -47,6 +52,11 @@
     .kanban-col-scroll::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 4px;
+    }
+
+    .drag-over {
+      border: 2px dashed #10b981 !important;
+      background: rgba(16, 185, 129, 0.1) !important;
     }
 
     .logo-glow {
@@ -96,7 +106,6 @@
   </main>
 
   <script>
-    // ඔබගේ අලුත්ම Web App URL එක මෙහි නිවැරදිව යොදා ඇත
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyJpTDl8rB9fI7CIIQAo6KA0h90ew6dtR8seUgnGanwNkYeOsiRjlQ_IGhC-TjZFM2y/exec';
 
     const columnsBase = [
@@ -148,6 +157,31 @@
       });
     }
 
+    // Drag and Drop Event Handlers
+    function handleDragStart(e, rowIndex) {
+      e.dataTransfer.setData("text/plain", rowIndex);
+      e.dataTransfer.effectAllowed = "move";
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      e.currentTarget.classList.add("drag-over");
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove("drag-over");
+    }
+
+    function handleDrop(e, targetStatus) {
+      e.preventDefault();
+      e.currentTarget.classList.remove("drag-over");
+      const rowIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+      if (!isNaN(rowIndex)) {
+        updateTicketStatus(rowIndex, targetStatus);
+      }
+    }
+
     function renderBoard(data) {
       const board = document.getElementById('kanbanBoard');
 
@@ -172,7 +206,10 @@
         const tickets = grouped[col.id] || [];
         
         boardHtml += `
-          <div class="w-72 sm:w-80 flex-shrink-0 liquid-glass-panel rounded-xl flex flex-col h-full max-h-full">
+          <div class="w-72 sm:w-80 flex-shrink-0 liquid-glass-panel rounded-xl flex flex-col h-full max-h-full"
+               ondragover="handleDragOver(event)" 
+               ondragleave="handleDragLeave(event)" 
+               ondrop="handleDrop(event, '${col.id}')">
             <div class="p-3 border-b border-white/10 flex justify-between items-center bg-slate-900/60 rounded-t-xl">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full ${col.color} shadow-[0_0_8px_currentColor]"></span>
@@ -191,12 +228,14 @@
             const ticketId = tk.ticketNumber;
             const customer = tk.customerName;
             const phone = tk.phoneNumber;
-            const device = `${tk.deviceType} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`;
+            const device = `${tk.deviceType || ''} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`.trim();
             const selectId = `status-select-${tk.rowIndex}`;
             const msgInputId = `msg-input-${tk.rowIndex}`;
 
             boardHtml += `
-              <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs">
+              <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs"
+                   draggable="true" 
+                   ondragstart="handleDragStart(event, ${tk.rowIndex})">
                 <div>
                   <div class="flex justify-between items-start gap-2 mb-1">
                     <span class="font-brand font-extrabold text-emerald-400 text-xs sm:text-sm tracking-wide">${device}</span>
@@ -220,7 +259,7 @@
 
                   <div>
                     <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">WhatsApp Message:</label>
-                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">ආයුබෝවන් ${customer}, ඔබගේ ${device} අලුත්වැඩියා කටයුතු දැන් (${col.title}) තත්වයේ පවතී. - SKY TECHNOLOGIES</textarea>
+                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">ආයුබෝවන් ${customer}, ඔබගේ Ticket (${ticketId}) අලුත්වැඩියා කටයුතු දැන් (${col.title}) තත්වයේ පවතී. - SKY TECHNOLOGIES</textarea>
                   </div>
 
                   <div class="flex justify-between items-center gap-2 pt-1">
