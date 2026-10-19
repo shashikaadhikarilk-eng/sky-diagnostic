@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKY TECHNOLOGIES - Helpdesk Kanban Board</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
+      background: radial-gradient(circle at 50% 10%, #0d1e30 0%, #050b14 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .font-brand { font-family: 'Orbitron', sans-serif; }
+
+    .liquid-glass-panel {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .ticket-card {
+      background: rgba(2, 6, 23, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: grab;
+    }
+    .ticket-card:active {
+      cursor: grabbing;
+      opacity: 0.6;
+    }
+    .ticket-card:hover {
+      border-color: rgba(34, 197, 94, 0.6);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    .kanban-col-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .kanban-col-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .kanban-col-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .drag-over {
+      border: 2px dashed #10b981 !important;
+      background: rgba(16, 185, 129, 0.1) !important;
+    }
+
+    .logo-glow {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+    }
+
+    .blob {
+      position: absolute;
+      filter: blur(120px);
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-5 flex flex-col h-screen overflow-hidden relative">
+
+  <div class="blob w-[30rem] h-[30rem] bg-emerald-600/15 top-0 left-10"></div>
+  <div class="blob w-[30rem] h-[30rem] bg-cyan-600/15 bottom-0 right-10"></div>
+
+  <!-- Header Section -->
+  <header class="liquid-glass-panel rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0 z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-slate-900 border border-emerald-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
+        <img src="logo.png" alt="SKY Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span class="hidden font-brand text-emerald-400 font-bold text-xs">SKY</span>
+      </div>
+      <div>
+        <h1 class="font-brand text-base sm:text-lg font-bold text-white tracking-wider flex items-center gap-2">
+          SKY <span class="text-emerald-400">TECHNOLOGIES</span>
+        </h1>
+        <p class="text-[10px] sm:text-xs text-cyan-400 font-semibold tracking-wider">HELPDESK KANBAN BOARD</p>
+      </div>
+    </div>
+
+    <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition flex items-center gap-2 cursor-pointer">
+      <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
+    </button>
+  </header>
+
+  <!-- Kanban Columns Container -->
+  <main id="kanbanBoard" class="flex-1 flex gap-3 sm:gap-4 overflow-x-auto pb-2 items-start h-full z-10">
+    <div class="w-full text-center py-20 text-slate-400 font-brand">
+      <i class="fa-solid fa-spinner fa-spin text-3xl text-emerald-400 mb-3"></i>
+      <p>LOADING HELPDESK TICKETS...</p>
+    </div>
+  </main>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyJpTDl8rB9fI7CIIQAo6KA0h90ew6dtR8seUgnGanwNkYeOsiRjlQ_IGhC-TjZFM2y/exec';
+
+    const columnsBase = [
+      { id: "New Ticket", title: "New Ticket", color: "bg-blue-500" },
+      { id: "In Process", title: "In Process", color: "bg-amber-500" },
+      { id: "On Hold", title: "On Hold", color: "bg-purple-500" },
+      { id: "Parts Pending", title: "Parts Pending", color: "bg-orange-500" },
+      { id: "Ready For Collect", title: "Ready For Collect", color: "bg-emerald-500" },
+      { id: "Delivered", title: "Delivered", color: "bg-slate-500" }
+    ];
+
+    let globalTickets = [];
+
+    function updateTicketStatus(rowIndex, newStatus) {
+      const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
+      if (ticket) ticket.status = newStatus;
+
+      renderBoard(globalTickets);
+
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ 
+          action: 'updateStatus', 
+          rowIndex: rowIndex, 
+          status: newStatus 
+        })
+      })
+      .then(res => res.json())
+      .then(data => console.log("Status updated successfully:", data))
+      .catch(err => console.error("Error updating status:", err));
+    }
+
+    function sendWhatsAppUpdate(phone, msgInputId) {
+      const messageBox = document.getElementById(msgInputId);
+      const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
+      const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
+
+      fetch(nodeRedWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone, message: customMessage })
+      })
+      .then(res => res.json())
+      .then(data => alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!"))
+      .catch(err => {
+        console.error("දෝෂයක් සිදු විය:", err);
+        alert("Node-RED වෙත සම්බන්ධ වීමේදී දෝෂයක් ඇති විය.");
+      });
+    }
+
+    // Drag and Drop Event Handlers
+    function handleDragStart(e, rowIndex) {
+      e.dataTransfer.setData("text/plain", rowIndex);
+      e.dataTransfer.effectAllowed = "move";
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      e.currentTarget.classList.add("drag-over");
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove("drag-over");
+    }
+
+    function handleDrop(e, targetStatus) {
+      e.preventDefault();
+      e.currentTarget.classList.remove("drag-over");
+      const rowIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+      if (!isNaN(rowIndex)) {
+        updateTicketStatus(rowIndex, targetStatus);
+      }
+    }
+
+    function renderBoard(data) {
+      const board = document.getElementById('kanbanBoard');
+
+      if (!data || data.length === 0) {
+        board.innerHTML = `<div class="text-center w-full py-10 text-slate-400">No Tickets Found.</div>`;
+        return;
+      }
+
+      const grouped = {};
+      columnsBase.forEach(col => grouped[col.id] = []);
+
+      data.forEach(item => {
+        const rawStatus = (item.status || "New Ticket").trim();
+        const matchingCol = columnsBase.find(c => c.id.toLowerCase() === rawStatus.toLowerCase());
+        const targetCol = matchingCol ? matchingCol.id : "New Ticket";
+        grouped[targetCol].push(item);
+      });
+
+      let boardHtml = "";
+
+      columnsBase.forEach(col => {
+        const tickets = grouped[col.id] || [];
+        
+        boardHtml += `
+          <div class="w-72 sm:w-80 flex-shrink-0 liquid-glass-panel rounded-xl flex flex-col h-full max-h-full"
+               ondragover="handleDragOver(event)" 
+               ondragleave="handleDragLeave(event)" 
+               ondrop="handleDrop(event, '${col.id}')">
+            <div class="p-3 border-b border-white/10 flex justify-between items-center bg-slate-900/60 rounded-t-xl">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full ${col.color} shadow-[0_0_8px_currentColor]"></span>
+                <h2 class="font-bold text-xs text-slate-200 tracking-wider">${col.title}</h2>
+              </div>
+              <span class="text-xs bg-slate-800/80 text-emerald-400 px-2 py-0.5 rounded-full font-bold font-mono border border-white/10">${tickets.length}</span>
+            </div>
+
+            <div class="p-2 flex-1 overflow-y-auto space-y-2.5 kanban-col-scroll">
+        `;
+
+        if (tickets.length === 0) {
+          boardHtml += `<div class="text-center py-8 text-slate-500 text-xs italic">No tickets in this column</div>`;
+        } else {
+          tickets.slice().reverse().forEach((tk) => {
+            const ticketId = tk.ticketNumber;
+            const customer = tk.customerName;
+            const phone = tk.phoneNumber;
+            const device = `${tk.deviceType || ''} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`.trim();
+            const selectId = `status-select-${tk.rowIndex}`;
+            const msgInputId = `msg-input-${tk.rowIndex}`;
+
+            boardHtml += `
+              <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs"
+                   draggable="true" 
+                   ondragstart="handleDragStart(event, ${tk.rowIndex})">
+                <div>
+                  <div class="flex justify-between items-start gap-2 mb-1">
+                    <span class="font-brand font-extrabold text-emerald-400 text-xs sm:text-sm tracking-wide">${device}</span>
+                  </div>
+                  <div class="text-slate-400 text-[10px] sm:text-[11px] font-mono">${ticketId}</div>
+                  <div class="text-slate-100 font-semibold mt-1 text-xs">${customer}</div>
+                  <div class="text-slate-400 text-[11px] truncate mt-0.5"><i class="fa-solid fa-wrench text-slate-500 mr-1"></i> ${tk.faultDescription}</div>
+                </div>
+
+                <div class="pt-2 border-t border-white/10 space-y-2">
+                  <div>
+                    <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Process State:</label>
+                    <select id="${selectId}" onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-slate-950/80 border border-slate-700/80 text-emerald-300 text-[11px] rounded p-1 focus:outline-none focus:border-emerald-500 cursor-pointer">
+                      ${columnsBase.map(c => `
+                        <option value="${c.id}" class="bg-slate-900 text-slate-200" ${c.id === col.id ? 'selected' : ''}>
+                          ${c.title}
+                        </option>
+                      `).join('')}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">WhatsApp Message:</label>
+                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">ආයුබෝවන් ${customer}, ඔබගේ Ticket (${ticketId}) අලුත්වැඩියා කටයුතු දැන් (${col.title}) තත්වයේ පවතී. - SKY TECHNOLOGIES</textarea>
+                  </div>
+
+                  <div class="flex justify-between items-center gap-2 pt-1">
+                    <span class="text-[10px] text-slate-400 font-mono"><i class="fa-solid fa-phone mr-1"></i>${phone}</span>
+
+                    <button onclick="sendWhatsAppUpdate('${phone}', '${msgInputId}')" 
+                            class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 border border-emerald-500/40 font-bold px-2.5 py-1.5 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
+                      <i class="fa-brands fa-whatsapp text-xs"></i> SEND MSG
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        boardHtml += `
+            </div>
+          </div>
+        `;
+      });
+
+      board.innerHTML = boardHtml;
+    }
+
+    function fetchTickets() {
+      const board = document.getElementById('kanbanBoard');
+
+      board.innerHTML = `
+        <div class="w-full text-center py-20 text-slate-400 font-brand">
+          <i class="fa-solid fa-spinner fa-spin text-3xl text-emerald-400 mb-3"></i>
+          <p>FETCHING HELPDESK TICKETS...</p>
+        </div>`;
+
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            board.innerHTML = `<div class="text-center w-full py-10 text-red-400 font-brand">Sheet Error: ${data.error}</div>`;
+            return;
+          }
+          globalTickets = data;
+          renderBoard(globalTickets);
+        })
+        .catch(err => {
+          console.error(err);
+          board.innerHTML = `<div class="text-center w-full py-10 text-red-400 font-brand">Failed to load tickets. Please check Web App URL.</div>`;
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchTickets);
+  </script>
+</body>
+</html>
