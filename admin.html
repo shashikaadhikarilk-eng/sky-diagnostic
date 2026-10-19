@@ -67,6 +67,7 @@
   <div class="blob w-[30rem] h-[30rem] bg-emerald-600/15 top-0 left-10"></div>
   <div class="blob w-[30rem] h-[30rem] bg-cyan-600/15 bottom-0 right-10"></div>
 
+  <!-- Header Section -->
   <header class="liquid-glass-panel rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0 z-10">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-full bg-slate-900 border border-emerald-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
@@ -86,6 +87,7 @@
     </button>
   </header>
 
+  <!-- Kanban Columns Container -->
   <main id="kanbanBoard" class="flex-1 flex gap-3 sm:gap-4 overflow-x-auto pb-2 items-start h-full z-10">
     <div class="w-full text-center py-20 text-slate-400 font-brand">
       <i class="fa-solid fa-spinner fa-spin text-3xl text-emerald-400 mb-3"></i>
@@ -94,7 +96,8 @@
   </main>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyXQHAj1PvkJi7NFV5cKLe2vVQlcQcK6WxU8uSbCu6Sc8mlb2BqDw25nTH-ZadKqRQP/exec';
+    // ඔබගේ අලුත්ම Web App URL එක මෙහි ඇත
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwdWDzTog3ZBhkaf-xaJc4IAB1ncDnwJHMvWQ3ATg1AvK2fUo4LeXnt-Z4WRAHuWiCt/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "bg-blue-500" },
@@ -140,22 +143,15 @@
     function sendWhatsAppUpdate(phone, msgInputId) {
       const messageBox = document.getElementById(msgInputId);
       const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
-
       const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
 
       fetch(nodeRedWebhookUrl, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify({ 
-          phone: phone,
-          message: customMessage 
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone, message: customMessage })
       })
       .then(res => res.json())
       .then(data => {
-        console.log("Node-RED හරහා පණිවිඩය යැවීම සාර්ථකයි:", data);
         alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
       })
       .catch(err => {
