@@ -146,11 +146,20 @@
 
       fetch(nodeRedWebhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true' // ngrok warning page එක skip කිරීමට
+        },
         body: JSON.stringify({ phone: phone, message: customMessage })
       })
-      .then(res => res.json())
-      .then(data => alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!"))
+      .then(res => {
+        if (res.ok) {
+          alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!");
+        } else {
+          console.log("Response status:", res.status);
+          alert("Node-RED වෙතින් සාර්ථක ප්‍රතිචාරයක් නොලැබුණි. (Status: " + res.status + ")");
+        }
+      })
       .catch(err => {
         console.error("දෝෂයක් සිදු විය:", err);
         alert("Node-RED වෙත සම්බන්ධ වීමේදී දෝෂයක් ඇති විය.");
@@ -314,3 +323,4 @@
   </script>
 </body>
 </html>
+```[cite: 1]
