@@ -70,10 +70,6 @@
       z-index: 0;
       pointer-events: none;
     }
-
-    #whatsappDrawer {
-      transition: transform 0.3s ease-in-out;
-    }
   </style>
 </head>
 <body class="p-3 sm:p-5 flex flex-col h-screen overflow-hidden relative">
@@ -85,8 +81,7 @@
   <header class="liquid-glass-panel rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex justify-between items-center gap-3 flex-shrink-0 z-10">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-full bg-slate-900 border border-emerald-500 overflow-hidden logo-glow flex-shrink-0 flex items-center justify-center">
-        <img src="logo.png" alt="SKY Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <span class="hidden font-brand text-emerald-400 font-bold text-xs">SKY</span>
+        <span class="font-brand text-emerald-400 font-bold text-xs">SKY</span>
       </div>
       <div>
         <h1 class="font-brand text-base sm:text-lg font-bold text-white tracking-wider flex items-center gap-2">
@@ -96,16 +91,9 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <!-- WhatsApp Inbox Toggle Button -->
-      <button onclick="toggleWhatsAppDrawer()" class="font-brand bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/50 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg transition flex items-center gap-2 cursor-pointer">
-        <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WHATSAPP INBOX</span>
-      </button>
-
-      <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition flex items-center gap-2 cursor-pointer">
-        <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
-      </button>
-    </div>
+    <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg transition flex items-center gap-2 cursor-pointer">
+      <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
+    </button>
   </header>
 
   <!-- Kanban Columns Container -->
@@ -116,49 +104,8 @@
     </div>
   </main>
 
-  <!-- WhatsApp Side Drawer / Inbox Modal -->
-  <div id="whatsappDrawer" class="fixed inset-y-0 right-0 w-full sm:w-[480px] liquid-glass-panel border-l border-emerald-500/30 z-50 transform translate-x-full flex flex-col shadow-2xl">
-    <div class="p-3.5 bg-slate-950/80 border-b border-white/10 flex justify-between items-center">
-      <div class="flex items-center gap-2">
-        <i class="fa-brands fa-whatsapp text-emerald-400 text-lg"></i>
-        <span class="font-brand font-bold text-sm text-white tracking-wider">WhatsApp Web Inbox</span>
-      </div>
-      <button onclick="toggleWhatsAppDrawer()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition cursor-pointer">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-    </div>
-
-    <!-- WhatsApp UI / Web Interface Frame -->
-    <div class="flex-1 bg-slate-950 relative flex flex-col">
-      <iframe id="whatsappFrame" src="" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-      <div id="iframeLoader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-400 text-xs font-mono">
-        <i class="fa-solid fa-spinner fa-spin text-2xl text-emerald-400 mb-2"></i>
-        <p>Connecting to WhatsApp Service...</p>
-      </div>
-    </div>
-  </div>
-
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyJpTDl8rB9fI7CIIQAo6KA0h90ew6dtR8seUgnGanwNkYeOsiRjlQ_IGhC-TjZFM2y/exec';
-    
-    // Updated Ngrok HTTPS URL for Node-RED UI
-    const whatsappWebUiUrl = 'https://luckless-predict-footboard.ngrok-free.dev/ui';
-
-    function toggleWhatsAppDrawer() {
-      const drawer = document.getElementById('whatsappDrawer');
-      const iframe = document.getElementById('whatsappFrame');
-      const loader = document.getElementById('iframeLoader');
-
-      if (drawer.classList.contains('translate-x-full')) {
-        drawer.classList.remove('translate-x-full');
-        if (!iframe.src || iframe.src === 'about:blank') {
-          iframe.src = whatsappWebUiUrl;
-          iframe.onload = () => { loader.style.display = 'none'; };
-        }
-      } else {
-        drawer.classList.add('translate-x-full');
-      }
-    }
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "bg-blue-500" },
@@ -171,12 +118,54 @@
 
     let globalTickets = [];
 
+    // භාෂාව අනුව ස්වයංක්‍රීය පණිවිඩ සැකසීම
+    function getLocalizedMessage(lang, customer, ticketId, status, device) {
+      if (lang === 'si') {
+        return `ආයුබෝවන් ${customer}, ඔබගේ ${device} අලුත්වැඩියා කටයුතු (Ticket: ${ticketId}) දැන් [ ${status} ] තත්වයේ පවතී. - SKY TECHNOLOGIES`;
+      } else if (lang === 'ta') {
+        return `வணக்கம் ${customer}, உங்களது ${device} பழுதுபார்ப்பு (Ticket: ${ticketId}) தற்பொழுது [ ${status} ] நிலையில் உள்ளது. - SKY TECHNOLOGIES`;
+      } else {
+        return `Hello ${customer}, your ${device} repair (Ticket: ${ticketId}) is now in [ ${status} ] status. - SKY TECHNOLOGIES`;
+      }
+    }
+
+    function updateLanguage(rowIndex, lang) {
+      const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
+      if (!ticket) return;
+
+      const customer = ticket.customerName;
+      const ticketId = ticket.ticketNumber;
+      const statusSelect = document.getElementById(`status-select-${rowIndex}`);
+      const currentStatus = statusSelect ? statusSelect.value : ticket.status;
+      const device = `${ticket.deviceType || ''} ${ticket.deviceModel ? '- ' + ticket.deviceModel : ''}`.trim();
+
+      const msgBox = document.getElementById(`msg-input-${rowIndex}`);
+      if (msgBox) {
+        msgBox.value = getLocalizedMessage(lang, customer, ticketId, currentStatus, device);
+      }
+    }
+
     function updateTicketStatus(rowIndex, newStatus) {
       const ticket = globalTickets.find(t => t.rowIndex === rowIndex);
-      if (ticket) ticket.status = newStatus;
+      if (ticket) {
+        ticket.status = newStatus;
+        
+        // භාෂාව තෝරාගෙන ඇති ආකාරයට මැසේජ් එක ඔටෝ අප්ඩේට් කිරීම
+        const langSelect = document.getElementById(`lang-select-${rowIndex}`);
+        const currentLang = langSelect ? langSelect.value : 'si';
+        const customer = ticket.customerName;
+        const ticketId = ticket.ticketNumber;
+        const device = `${ticket.deviceType || ''} ${ticket.deviceModel ? '- ' + ticket.deviceModel : ''}`.trim();
+        
+        const msgBox = document.getElementById(`msg-input-${rowIndex}`);
+        if (msgBox) {
+          msgBox.value = getLocalizedMessage(currentLang, customer, ticketId, newStatus, device);
+        }
+      }
 
       renderBoard(globalTickets);
 
+      // Google Sheet එක යාවත්කාලීන කිරීම
       fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -191,27 +180,22 @@
       .catch(err => console.error("Error updating status:", err));
     }
 
-    function sendWhatsAppUpdate(phone, msgInputId) {
+    function openWhatsApp(phone, msgInputId) {
       const messageBox = document.getElementById(msgInputId);
-      const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
-      const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
+      let customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES Update.";
+      
+      // දුරකථන අංකය නිවැරදි ආකෘතියට සකස් කිරීම (උදා: 947XXXXXXXX)
+      let cleanPhone = phone.toString().replace(/\D/g, '');
+      if (cleanPhone.startsWith('0')) {
+        cleanPhone = '94' + cleanPhone.substring(1);
+      }
 
-      fetch(nodeRedWebhookUrl, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        },
-        body: JSON.stringify({ phone: phone, message: customMessage })
-      })
-      .then(res => res.json())
-      .then(data => alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!"))
-      .catch(err => {
-        console.error("දෝෂයක් සිදු විය:", err);
-        alert("Node-RED වෙත සම්බන්ධ වීමේදී දෝෂයක් ඇති විය.");
-      });
+      // WhatsApp Web / App වෙත ලින්ක් එක හරහා යාම
+      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(customMessage)}`;
+      window.open(whatsappUrl, '_blank');
     }
 
+    // Drag and Drop Event Handlers
     function handleDragStart(e, rowIndex) {
       e.dataTransfer.setData("text/plain", rowIndex);
       e.dataTransfer.effectAllowed = "move";
@@ -266,7 +250,7 @@
                ondrop="handleDrop(event, '${col.id}')">
             <div class="p-3 border-b border-white/10 flex justify-between items-center bg-slate-900/60 rounded-t-xl">
               <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full ${col.color} shadow-[0_0_8px_currentColor]"></span>
+                <span class="w-2.5 h-2.5 rounded-full ${col.color}"></span>
                 <h2 class="font-bold text-xs text-slate-200 tracking-wider">${col.title}</h2>
               </div>
               <span class="text-xs bg-slate-800/80 text-emerald-400 px-2 py-0.5 rounded-full font-bold font-mono border border-white/10">${tickets.length}</span>
@@ -285,6 +269,8 @@
             const device = `${tk.deviceType || ''} ${tk.deviceModel ? '- ' + tk.deviceModel : ''}`.trim();
             const selectId = `status-select-${tk.rowIndex}`;
             const msgInputId = `msg-input-${tk.rowIndex}`;
+            const langSelectId = `lang-select-${tk.rowIndex}`;
+            const defaultMsg = `ආයුබෝවන් ${customer}, ඔබගේ ${device} අලුත්වැඩියා කටයුතු (Ticket: ${ticketId}) දැන් [ ${col.title} ] තත්වයේ පවතී. - SKY TECHNOLOGIES`;
 
             boardHtml += `
               <div class="ticket-card p-3 rounded-lg flex flex-col justify-between space-y-2 text-xs"
@@ -294,15 +280,15 @@
                   <div class="flex justify-between items-start gap-2 mb-1">
                     <span class="font-brand font-extrabold text-emerald-400 text-xs sm:text-sm tracking-wide">${device}</span>
                   </div>
-                  <div class="text-slate-400 text-[10px] sm:text-[11px] font-mono">${ticketId}</div>
+                  <div class="text-slate-400 text-[10px] font-mono">${ticketId}</div>
                   <div class="text-slate-100 font-semibold mt-1 text-xs">${customer}</div>
                   <div class="text-slate-400 text-[11px] truncate mt-0.5"><i class="fa-solid fa-wrench text-slate-500 mr-1"></i> ${tk.faultDescription}</div>
                 </div>
 
                 <div class="pt-2 border-t border-white/10 space-y-2">
                   <div>
-                    <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Process State:</label>
-                    <select id="${selectId}" onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-slate-950/80 border border-slate-700/80 text-emerald-300 text-[11px] rounded p-1 focus:outline-none focus:border-emerald-500 cursor-pointer">
+                    <label class="text-[9px] text-cyan-400 font-bold uppercase tracking-wider block mb-1">Select Status:</label>
+                    <select id="${selectId}" onchange="updateTicketStatus(${tk.rowIndex}, this.value)" class="w-full bg-slate-950/80 border border-slate-700/80 text-emerald-300 text-[11px] rounded p-1 focus:outline-none cursor-pointer">
                       ${columnsBase.map(c => `
                         <option value="${c.id}" class="bg-slate-900 text-slate-200" ${c.id === col.id ? 'selected' : ''}>
                           ${c.title}
@@ -311,17 +297,25 @@
                     </select>
                   </div>
 
+                  <div class="flex justify-between items-center">
+                    <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Language:</label>
+                    <select id="${langSelectId}" onchange="updateLanguage(${tk.rowIndex}, this.value)" class="bg-slate-950 border border-slate-700 text-cyan-300 text-[10px] rounded px-1 py-0.5">
+                      <option value="si">සිංහල (Sinhala)</option>
+                      <option value="ta">தமிழ் (Tamil)</option>
+                      <option value="en">English</option>
+                    </select>
+                  </div>
+
                   <div>
-                    <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">WhatsApp Message:</label>
-                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">ආයුබෝවන් ${customer}, ඔබගේ Ticket (${ticketId}) අලුත්වැඩියා කටයුතු දැන් (${col.title}) තත්වයේ පවතී. - SKY TECHNOLOGIES</textarea>
+                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">${defaultMsg}</textarea>
                   </div>
 
                   <div class="flex justify-between items-center gap-2 pt-1">
                     <span class="text-[10px] text-slate-400 font-mono"><i class="fa-solid fa-phone mr-1"></i>${phone}</span>
 
-                    <button onclick="sendWhatsAppUpdate('${phone}', '${msgInputId}')" 
+                    <button onclick="openWhatsApp('${phone}', '${msgInputId}')" 
                             class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 border border-emerald-500/40 font-bold px-2.5 py-1.5 rounded transition text-[10px] flex items-center gap-1 cursor-pointer">
-                      <i class="fa-brands fa-whatsapp text-xs"></i> SEND MSG
+                      <i class="fa-brands fa-whatsapp text-xs"></i> SEND WHATSAPP
                     </button>
                   </div>
                 </div>
@@ -341,7 +335,6 @@
 
     function fetchTickets() {
       const board = document.getElementById('kanbanBoard');
-
       board.innerHTML = `
         <div class="w-full text-center py-20 text-slate-400 font-brand">
           <i class="fa-solid fa-spinner fa-spin text-3xl text-emerald-400 mb-3"></i>
@@ -360,7 +353,7 @@
         })
         .catch(err => {
           console.error(err);
-          board.innerHTML = `<div class="text-center w-full py-10 text-red-400 font-brand">Failed to load tickets. Please check Web App URL.</div>`;
+          board.innerHTML = `<div class="text-center w-full py-10 text-red-400 font-brand">Failed to load tickets.</div>`;
         });
     }
 
