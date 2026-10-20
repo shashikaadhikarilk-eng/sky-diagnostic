@@ -70,6 +70,11 @@
       z-index: 0;
       pointer-events: none;
     }
+
+    /* WhatsApp Drawer Styles */
+    #whatsappDrawer {
+      transition: transform 0.3s ease-in-out;
+    }
   </style>
 </head>
 <body class="p-3 sm:p-5 flex flex-col h-screen overflow-hidden relative">
@@ -92,9 +97,16 @@
       </div>
     </div>
 
-    <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition flex items-center gap-2 cursor-pointer">
-      <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
-    </button>
+    <div class="flex items-center gap-2">
+      <!-- WhatsApp Inbox Toggle Button -->
+      <button onclick="toggleWhatsAppDrawer()" class="font-brand bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/50 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg transition flex items-center gap-2 cursor-pointer">
+        <i class="fa-brands fa-whatsapp text-sm"></i> <span class="hidden sm:inline">WHATSAPP INBOX</span>
+      </button>
+
+      <button onclick="fetchTickets()" class="font-brand bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-xs font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition flex items-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">REFRESH BOARD</span>
+      </button>
+    </div>
   </header>
 
   <!-- Kanban Columns Container -->
@@ -105,8 +117,50 @@
     </div>
   </main>
 
+  <!-- WhatsApp Side Drawer / Inbox Modal -->
+  <div id="whatsappDrawer" class="fixed inset-y-0 right-0 w-full sm:w-[480px] liquid-glass-panel border-l border-emerald-500/30 z-50 transform translate-x-full flex flex-col shadow-2xl">
+    <div class="p-3.5 bg-slate-950/80 border-b border-white/10 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <i class="fa-brands fa-whatsapp text-emerald-400 text-lg"></i>
+        <span class="font-brand font-bold text-sm text-white tracking-wider">WhatsApp Web Inbox</span>
+      </div>
+      <button onclick="toggleWhatsAppDrawer()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- WhatsApp UI / Web Interface Frame (Node-RED dashboard UI or Baileys Web Client) -->
+    <div class="flex-1 bg-slate-950 relative flex flex-col">
+      <iframe id="whatsappFrame" src="" class="w-full h-full border-0"></iframe>
+      <div id="iframeLoader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-400 text-xs font-mono">
+        <i class="fa-solid fa-spinner fa-spin text-2xl text-emerald-400 mb-2"></i>
+        <p>Connecting to WhatsApp Service...</p>
+      </div>
+    </div>
+  </div>
+
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyJpTDl8rB9fI7CIIQAo6KA0h90ew6dtR8seUgnGanwNkYeOsiRjlQ_IGhC-TjZFM2y/exec';
+    
+    // ඔබේ Node-RED UI හෝ WhatsApp Web UI URL එක මෙතනට දෙන්න (උදා: Node-RED dashboard URL හෝ Ngrok UI link එකක්)
+    const whatsappWebUiUrl = 'http://127.0.0.1:1880/ui'; // හෝ ඔබගේ Ngrok / Node-RED UI ලින්ක් එක
+
+    function toggleWhatsAppDrawer() {
+      const drawer = document.getElementById('whatsappDrawer');
+      const iframe = document.getElementById('whatsappFrame');
+      const loader = document.getElementById('iframeLoader');
+
+      if (drawer.classList.contains('translate-x-full')) {
+        drawer.classList.remove('translate-x-full');
+        // පළමු වරට ඕපන් වන විට iframe එක load කිරීම
+        if (!iframe.src || iframe.src === 'about:blank') {
+          iframe.src = whatsappWebUiUrl;
+          iframe.onload = () => { loader.style.display = 'none'; };
+        }
+      } else {
+        drawer.classList.add('translate-x-full');
+      }
+    }
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "bg-blue-500" },
@@ -157,7 +211,6 @@
       });
     }
 
-    // Drag and Drop Event Handlers
     function handleDragStart(e, rowIndex) {
       e.dataTransfer.setData("text/plain", rowIndex);
       e.dataTransfer.effectAllowed = "move";
