@@ -71,7 +71,6 @@
       pointer-events: none;
     }
 
-    /* WhatsApp Drawer Styles */
     #whatsappDrawer {
       transition: transform 0.3s ease-in-out;
     }
@@ -129,9 +128,9 @@
       </button>
     </div>
 
-    <!-- WhatsApp UI / Web Interface Frame (Node-RED dashboard UI or Baileys Web Client) -->
+    <!-- WhatsApp UI / Web Interface Frame -->
     <div class="flex-1 bg-slate-950 relative flex flex-col">
-      <iframe id="whatsappFrame" src="" class="w-full h-full border-0"></iframe>
+      <iframe id="whatsappFrame" src="" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
       <div id="iframeLoader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-400 text-xs font-mono">
         <i class="fa-solid fa-spinner fa-spin text-2xl text-emerald-400 mb-2"></i>
         <p>Connecting to WhatsApp Service...</p>
@@ -142,8 +141,8 @@
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyJpTDl8rB9fI7CIIQAo6KA0h90ew6dtR8seUgnGanwNkYeOsiRjlQ_IGhC-TjZFM2y/exec';
     
-    // ඔබේ Node-RED UI හෝ WhatsApp Web UI URL එක මෙතනට දෙන්න (උදා: Node-RED dashboard URL හෝ Ngrok UI link එකක්)
-    const whatsappWebUiUrl = 'http://127.0.0.1:1880/ui'; // හෝ ඔබගේ Ngrok / Node-RED UI ලින්ක් එක
+    // Updated Ngrok HTTPS URL for Node-RED UI
+    const whatsappWebUiUrl = 'https://luckless-predict-footboard.ngrok-free.dev/ui';
 
     function toggleWhatsAppDrawer() {
       const drawer = document.getElementById('whatsappDrawer');
@@ -152,7 +151,6 @@
 
       if (drawer.classList.contains('translate-x-full')) {
         drawer.classList.remove('translate-x-full');
-        // පළමු වරට ඕපන් වන විට iframe එක load කිරීම
         if (!iframe.src || iframe.src === 'about:blank') {
           iframe.src = whatsappWebUiUrl;
           iframe.onload = () => { loader.style.display = 'none'; };
@@ -200,7 +198,10 @@
 
       fetch(nodeRedWebhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
+        },
         body: JSON.stringify({ phone: phone, message: customMessage })
       })
       .then(res => res.json())
