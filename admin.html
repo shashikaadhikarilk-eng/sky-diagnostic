@@ -6,12 +6,12 @@
   <title>SKY TECHNOLOGIES - Helpdesk Kanban Board</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     body {
-      font-family: 'Rajdhani', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif;
+      font-family: 'Rajdhani', sans-serif;
       background: radial-gradient(circle at 50% 10%, #0d1e30 0%, #050b14 100%);
       color: #e2e8f0;
       min-height: 100vh;
@@ -106,7 +106,8 @@
   </main>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyJpTDl8rB9fI7CIIQAo6KA0h90ew6dtR8seUgnGanwNkYeOsiRjlQ_IGhC-TjZFM2y/exec';
+    // ඔබගේ Google Apps Script Web App URL එක මෙහි ලබා දී ඇත
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyv5s7Dmch0Lqa1d1kglkW8NcuOYvMpQqCVpwpX0MdP0fZvnSTUxundalI8OlaWIUY/exec';
 
     const columnsBase = [
       { id: "New Ticket", title: "New Ticket", color: "bg-blue-500" },
@@ -142,27 +143,11 @@
     function sendWhatsAppUpdate(phone, msgInputId) {
       const messageBox = document.getElementById(msgInputId);
       const customMessage = messageBox ? messageBox.value : "SKY TECHNOLOGIES: Update regarding your repair.";
-      const nodeRedWebhookUrl = 'https://luckless-predict-footboard.ngrok-free.dev/kanban-whatsapp';
-
-      fetch(nodeRedWebhookUrl, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        },
-        body: JSON.stringify({ phone: phone, message: customMessage })
-      })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json().catch(() => ({ success: true }));
-      })
-      .then(data => alert("WhatsApp පණිවිඩය සාර්ථකව යවන ලදී!"))
-      .catch(err => {
-        console.error("දෝෂයක් සිදු විය:", err);
-        alert("Node-RED වෙත සම්බන්ධ වීමේදී දෝෂයක් ඇති විය.");
-      });
+      
+      // GitHub Pages හෝ Static Hosting හරහා ක්‍රියාත්මක වන විට සෘජුවම WhatsApp වෙත යොමු කිරීම
+      const encodedMessage = encodeURIComponent(customMessage);
+      const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+      window.open(whatsappUrl, '_blank');
     }
 
     // Drag and Drop Event Handlers
@@ -267,7 +252,7 @@
 
                   <div>
                     <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mb-1">WhatsApp Message:</label>
-                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">ආයුබෝවන් ${customer}, ඔබගේ Ticket (${ticketId}) අලුත්වැඩියා කටයුතු දැන් (${col.title}) තත්වයේ පවතී. - SKY TECHNOLOGIES</textarea>
+                    <textarea id="${msgInputId}" class="w-full bg-slate-950/90 border border-slate-700/80 text-slate-200 text-[11px] rounded p-1.5 focus:outline-none focus:border-emerald-500" rows="2">Hello ${customer}, your repair ticket (${ticketId}) status is now (${col.title}). - SKY TECHNOLOGIES</textarea>
                   </div>
 
                   <div class="flex justify-between items-center gap-2 pt-1">
